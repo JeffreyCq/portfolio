@@ -504,6 +504,270 @@ section { padding: 6rem 5rem; }
 }
 .project-link:hover { opacity: 0.7; }
 
+/* ── NOW ── */
+#now { background: var(--bg2); }
+
+.now-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.now-focus-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: #28c840;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse-glow 1.8s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(40,200,64,0.5); }
+  50%       { box-shadow: 0 0 0 7px rgba(40,200,64,0); }
+}
+
+.now-project-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.now-project-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+.now-project-card.secondary::before {
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+}
+
+.now-project-name {
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+.now-project-desc {
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.75;
+  margin-bottom: 1.2rem;
+}
+.now-project-links { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── GITHUB ACTIVITY FEED ── */
+.gh-feed {
+  background: var(--ink);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: var(--mono);
+}
+.gh-feed-header {
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.gh-feed-title {
+  font-size: 10px;
+  color: #555;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.gh-feed-title svg { flex-shrink: 0; }
+.gh-feed-repo-tag {
+  font-size: 10px;
+  color: var(--accent2);
+  letter-spacing: 0.04em;
+  background: rgba(45,106,79,0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(45,106,79,0.3);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-decoration: none;
+}
+.gh-feed-repo-tag:hover { opacity: 0.75; }
+
+.commit-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid #1a1a1a;
+  align-items: center;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.commit-item:last-child { border-bottom: none; }
+.commit-item:hover { background: #161616; }
+.commit-sha {
+  font-size: 10px;
+  color: var(--accent2);
+  background: rgba(45,106,79,0.15);
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  border: 1px solid rgba(45,106,79,0.25);
+}
+.commit-info { overflow: hidden; }
+.commit-msg {
+  font-size: 12px;
+  color: #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+.commit-author {
+  font-size: 10px;
+  color: #444;
+  margin-top: 1px;
+}
+.commit-time {
+  font-size: 10px;
+  color: #444;
+  white-space: nowrap;
+}
+.gh-feed-loading {
+  padding: 2rem 1.2rem;
+  text-align: center;
+  font-size: 11px;
+  color: #444;
+  letter-spacing: 0.05em;
+}
+.gh-feed-error {
+  padding: 1.2rem;
+  font-size: 10px;
+  color: #555;
+  letter-spacing: 0.04em;
+}
+.gh-repo-stats {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.8rem 1.2rem;
+  border-top: 1px solid #1a1a1a;
+}
+.gh-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #555;
+  letter-spacing: 0.04em;
+}
+.gh-stat-val { color: #888; }
+
+/* ── PROJECT CARD — GitHub mini-feed ── */
+.project-gh {
+  border-top: 1px solid var(--border);
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+}
+.project-gh-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.project-gh-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.project-gh-pr {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgba(59,130,246,0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59,130,246,0.25);
+  letter-spacing: 0.04em;
+}
+.project-commits { display: flex; flex-direction: column; }
+.p-commit {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--border);
+  text-decoration: none;
+  color: inherit;
+}
+.p-commit:last-child { border-bottom: none; }
+.p-commit:hover .p-commit-msg { color: var(--accent); }
+.p-commit-sha {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(26,71,42,0.15);
+}
+.p-commit-msg {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s;
+}
+.p-commit-time {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink3);
+  flex-shrink: 0;
+}
+.project-gh-loading {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.04em;
+  padding: 4px 0;
+}
+.project-gh-none {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.04em;
+  font-style: italic;
+}
+
 /* ── CERTS ── */
 #certifications { background: var(--ink); }
 #certifications .section-label { color: var(--accent2); }
@@ -690,6 +954,7 @@ footer {
   nav { padding: 0 1.5rem; }
   .hero-left { padding: 4rem 2rem; }
   .nav-links { display: none; }
+  .now-grid { grid-template-columns: 1fr; gap: 2rem; }
 }
 
 /* i18n hidden */
@@ -704,6 +969,7 @@ span[data-lang].active { display: inline; }
 <nav>
   <a href="#" class="nav-logo">jc@portfolio:~$</a>
   <ul class="nav-links">
+    <li><a href="#now">Now</a></li>
     <li><a href="#experience" data-i18n="nav-exp">Experience</a></li>
     <li><a href="#skills" data-i18n="nav-skills">Skills</a></li>
     <li><a href="#projects" data-i18n="nav-projects">Projects</a></li>
@@ -801,6 +1067,125 @@ span[data-lang].active { display: inline; }
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- NOW -->
+<section id="now">
+  <div class="section-label">
+    <span data-lang="en" class="active">01 / Now</span>
+    <span data-lang="es">01 / Ahora</span>
+  </div>
+  <h2 class="section-title">
+    <span data-lang="en" class="active">What I'm building</span>
+    <span data-lang="es">En qué estoy trabajando</span>
+  </h2>
+
+  <div class="now-grid">
+
+    <!-- Left: active projects -->
+    <div>
+
+      <!-- Featured WIP -->
+      <div class="now-focus-label">
+        <span class="pulse-dot"></span>
+        <span data-lang="en" class="active">Currently building</span>
+        <span data-lang="es">En desarrollo activo</span>
+      </div>
+
+      <div class="now-project-card fade-in"
+           data-repo="JeffreyCq/learn-wazuh"
+           data-repo-url="https://github.com/JeffreyCq/learn-wazuh">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
+          <span class="project-status status-wip">◐ IN PROGRESS</span>
+        </div>
+        <div class="now-project-name">Learn Wazuh Platform</div>
+        <p class="now-project-desc">
+          <span data-lang="en" class="active">An educational platform to teach Wazuh SIEM from scratch — covering installation, rule writing, dashboards, active response, and real-world SOC scenarios. Goal: make SIEM knowledge accessible to anyone.</span>
+          <span data-lang="es">Plataforma educativa para enseñar Wazuh SIEM desde cero — instalación, escritura de reglas, dashboards, respuesta activa y escenarios SOC reales. Objetivo: hacer el conocimiento SIEM accesible.</span>
+        </p>
+        <div class="exp-tags" style="margin-bottom:1.2rem;">
+          <span class="tag">Wazuh</span>
+          <span class="tag">Next.js</span>
+          <span class="tag">Python</span>
+          <span class="tag">SOC</span>
+          <span class="tag">Education</span>
+        </div>
+        <div class="now-project-links">
+          <span class="project-link" style="opacity:0.45;cursor:default;">⏳
+            <span data-lang="en" class="active">Coming soon</span>
+            <span data-lang="es">Próximamente</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Also shipping label -->
+      <div class="now-focus-label" style="margin-top:0.5rem;">
+        <span data-lang="en" class="active">Also shipping</span>
+        <span data-lang="es">También en curso</span>
+      </div>
+
+      <!-- MailDefender -->
+      <div class="now-project-card secondary fade-in"
+           data-repo="JeffreyCq/phishguard"
+           data-repo-url="https://github.com/JeffreyCq/phishguard">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
+          <span class="project-status status-live">● LIVE</span>
+        </div>
+        <div class="now-project-name">MailDefender</div>
+        <p class="now-project-desc">
+          <span data-lang="en" class="active">AI-powered phishing email analyzer with SPF/DKIM/DMARC validation, VirusTotal & AbuseIPDB checks, and a Groq Llama 3.3 70B verdict engine. Weighted 0–100 risk score.</span>
+          <span data-lang="es">Analizador de phishing con IA — validación SPF/DKIM/DMARC, checks en VirusTotal y AbuseIPDB, y veredicto generado por Groq Llama 3.3 70B. Score de riesgo 0–100.</span>
+        </p>
+        <div class="exp-tags" style="margin-bottom:1.2rem;">
+          <span class="tag">FastAPI</span>
+          <span class="tag">React</span>
+          <span class="tag">Groq AI</span>
+          <span class="tag">VirusTotal</span>
+          <span class="tag">Docker</span>
+        </div>
+        <div class="now-project-links">
+          <a href="https://maildefender.xyz" target="_blank" class="project-link">↗
+            <span data-lang="en" class="active">Visit site</span>
+            <span data-lang="es">Ver sitio</span>
+          </a>
+          <a href="https://github.com/JeffreyCq/phishguard" target="_blank" class="project-link">↗ GitHub</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: live GitHub activity feed -->
+    <div>
+      <div class="gh-feed fade-in" id="gh-activity-feed">
+        <div class="gh-feed-header">
+          <span class="gh-feed-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#555">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+            </svg>
+            <span data-lang="en" class="active">Recent activity</span>
+            <span data-lang="es">Actividad reciente</span>
+          </span>
+          <a href="https://github.com/JeffreyCq" target="_blank" class="gh-feed-repo-tag">JeffreyCq ↗</a>
+        </div>
+        <div id="gh-commits-container">
+          <div class="gh-feed-loading">
+            <span data-lang="en" class="active">Fetching commits...</span>
+            <span data-lang="es">Cargando commits...</span>
+          </div>
+        </div>
+        <div class="gh-repo-stats" id="gh-repo-stats" style="display:none;">
+          <span class="gh-stat">⭐ <span class="gh-stat-val" id="gh-stars">—</span></span>
+          <span class="gh-stat">🍴 <span class="gh-stat-val" id="gh-forks">—</span></span>
+          <span class="gh-stat">🔀 <span class="gh-stat-val" id="gh-prs">—</span>
+            <span data-lang="en" class="active">&nbsp;open PRs</span>
+            <span data-lang="es">&nbsp;PRs abiertos</span>
+          </span>
+          <span class="gh-stat">🕐 <span class="gh-stat-val" id="gh-pushed">—</span></span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -1015,10 +1400,22 @@ span[data-lang].active { display: inline; }
         <div class="project-links">
           <a href="https://easy-resu.me" target="_blank" class="project-link">↗ <span data-lang="en" class="active">Visit site</span><span data-lang="es">Ver sitio</span></a>
         </div>
+        <div class="project-gh">
+          <div class="project-gh-header">
+            <span class="project-gh-label">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+              <span data-lang="en" class="active">commits</span>
+              <span data-lang="es">commits</span>
+            </span>
+          </div>
+          <div class="project-commits">
+            <span class="project-gh-none">— private repo</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="project-card fade-in">
+    <div class="project-card fade-in" data-repo="JeffreyCq/phishguard">
       <div class="project-header">
         <span class="project-num">02</span>
         <span class="project-status status-live">● LIVE</span>
@@ -1036,7 +1433,20 @@ span[data-lang].active { display: inline; }
           <span class="tag">Google Workspace</span><span class="tag">Wazuh</span><span class="tag">Slack</span><span class="tag">Webhooks</span>
         </div>
         <div class="project-links">
-          <a href="https://github.com/JeffreyCq" target="_blank" class="project-link">↗ GitHub</a>
+          <a href="https://github.com/JeffreyCq/phishguard" target="_blank" class="project-link">↗ GitHub</a>
+        </div>
+        <div class="project-gh">
+          <div class="project-gh-header">
+            <span class="project-gh-label">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+              <span data-lang="en" class="active">commits</span>
+              <span data-lang="es">commits</span>
+            </span>
+            <span class="project-gh-pr" id="pr-phishguard" style="display:none;"></span>
+          </div>
+          <div class="project-commits" id="commits-phishguard">
+            <span class="project-gh-loading">loading...</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1056,15 +1466,27 @@ span[data-lang].active { display: inline; }
           <span data-lang="es">Plataforma educativa para enseñar Wazuh SIEM desde cero — instalación, escritura de reglas, dashboards, respuesta activa y escenarios SOC del mundo real.</span>
         </p>
         <div class="exp-tags" style="margin-bottom:1rem;">
-          <span class="tag">Wazuh</span><span class="tag">Education</span><span class="tag">SOC</span>
+          <span class="tag">Wazuh</span><span class="tag">Next.js</span><span class="tag">Python</span><span class="tag">SOC</span>
         </div>
         <div class="project-links">
           <span class="project-link" style="opacity:0.5; cursor:default;">⏳ <span data-lang="en" class="active">Coming soon</span><span data-lang="es">Próximamente</span></span>
         </div>
+        <div class="project-gh">
+          <div class="project-gh-header">
+            <span class="project-gh-label">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+              <span data-lang="en" class="active">commits</span>
+              <span data-lang="es">commits</span>
+            </span>
+          </div>
+          <div class="project-commits">
+            <span class="project-gh-none">— repo not public yet</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="project-card fade-in">
+    <div class="project-card fade-in" data-repo="JeffreyCq/phishguard">
       <div class="project-header">
         <span class="project-num">04</span>
         <span class="project-status status-live">● LIVE</span>
@@ -1081,6 +1503,19 @@ span[data-lang].active { display: inline; }
         <div class="project-links">
           <a href="https://maildefender.xyz" target="_blank" class="project-link">↗ <span data-lang="en" class="active">Visit site</span><span data-lang="es">Ver sitio</span></a>
           <a href="https://github.com/JeffreyCq/phishguard" target="_blank" class="project-link">↗ GitHub</a>
+        </div>
+        <div class="project-gh">
+          <div class="project-gh-header">
+            <span class="project-gh-label">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+              <span data-lang="en" class="active">commits · phishguard</span>
+              <span data-lang="es">commits · phishguard</span>
+            </span>
+            <span class="project-gh-pr" id="pr-maildefender" style="display:none;"></span>
+          </div>
+          <div class="project-commits" id="commits-maildefender">
+            <span class="project-gh-loading">loading...</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1227,6 +1662,139 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ── GitHub API integration ────────────────────────────────────────────────────
+
+function timeAgo(dateStr) {
+  const diff = (Date.now() - new Date(dateStr)) / 1000;
+  if (diff < 60)    return `${Math.floor(diff)}s ago`;
+  if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 604800)return `${Math.floor(diff / 86400)}d ago`;
+  return new Date(dateStr).toLocaleDateString('en', { month: 'short', day: 'numeric' });
+}
+
+const GH = 'https://api.github.com';
+const MAIN_REPO = 'JeffreyCq/phishguard';
+
+// Fetch latest commits from multiple repos, merge & sort
+async function loadActivityFeed() {
+  const container = document.getElementById('gh-commits-container');
+  const statsBar  = document.getElementById('gh-repo-stats');
+  if (!container) return;
+
+  const repos = [MAIN_REPO];
+  try {
+    const allCommits = [];
+
+    await Promise.all(repos.map(async repo => {
+      const [commitsRes, prsRes, repoRes] = await Promise.all([
+        fetch(`${GH}/repos/${repo}/commits?per_page=6`),
+        fetch(`${GH}/repos/${repo}/pulls?state=open&per_page=5`),
+        fetch(`${GH}/repos/${repo}`)
+      ]);
+
+      if (commitsRes.ok) {
+        const commits = await commitsRes.json();
+        commits.forEach(c => allCommits.push({ repo, commit: c }));
+      }
+      if (prsRes.ok && statsBar) {
+        const prs = await prsRes.json();
+        const el  = document.getElementById('gh-prs');
+        if (el) el.textContent = prs.length;
+      }
+      if (repoRes.ok && statsBar) {
+        const info = await repoRes.json();
+        const stars = document.getElementById('gh-stars');
+        const forks = document.getElementById('gh-forks');
+        const pushed= document.getElementById('gh-pushed');
+        if (stars)  stars.textContent  = info.stargazers_count;
+        if (forks)  forks.textContent  = info.forks_count;
+        if (pushed) pushed.textContent = timeAgo(info.pushed_at);
+        if (statsBar) statsBar.style.display = 'flex';
+      }
+    }));
+
+    // Sort by date desc, take top 7
+    allCommits.sort((a, b) =>
+      new Date(b.commit.commit.author.date) - new Date(a.commit.commit.author.date)
+    );
+
+    if (allCommits.length === 0) {
+      container.innerHTML = '<div class="gh-feed-error">No public commits found.</div>';
+      return;
+    }
+
+    container.innerHTML = allCommits.slice(0, 7).map(({ repo, commit: c }) => {
+      const sha  = c.sha.slice(0, 7);
+      const msg  = c.commit.message.split('\n')[0].slice(0, 72);
+      const ago  = timeAgo(c.commit.author.date);
+      const url  = c.html_url;
+      const repoShort = repo.split('/')[1];
+      return `<a href="${url}" target="_blank" class="commit-item">
+        <span class="commit-sha">${sha}</span>
+        <span class="commit-info">
+          <span class="commit-msg">${msg}</span>
+          <span class="commit-author">${repoShort}</span>
+        </span>
+        <span class="commit-time">${ago}</span>
+      </a>`;
+    }).join('');
+
+  } catch(e) {
+    container.innerHTML = '<div class="gh-feed-error">GitHub API unavailable — rate limited or offline.</div>';
+  }
+}
+
+// Load commits into a project card mini-feed
+async function loadProjectCommits(repo, commitsId, prId) {
+  const container = document.getElementById(commitsId);
+  const prBadge   = document.getElementById(prId);
+  if (!container) return;
+
+  try {
+    const [commitsRes, prsRes] = await Promise.all([
+      fetch(`${GH}/repos/${repo}/commits?per_page=3`),
+      fetch(`${GH}/repos/${repo}/pulls?state=open&per_page=5`)
+    ]);
+
+    if (prsRes.ok && prBadge) {
+      const prs = await prsRes.json();
+      if (prs.length > 0) {
+        prBadge.textContent = `${prs.length} open PR${prs.length > 1 ? 's' : ''}`;
+        prBadge.style.display = 'inline-block';
+      }
+    }
+
+    if (!commitsRes.ok) {
+      container.innerHTML = '<span class="project-gh-none">— repo unavailable</span>';
+      return;
+    }
+    const commits = await commitsRes.json();
+    if (!commits.length) {
+      container.innerHTML = '<span class="project-gh-none">— no commits yet</span>';
+      return;
+    }
+    container.innerHTML = commits.map(c => {
+      const sha = c.sha.slice(0, 7);
+      const msg = c.commit.message.split('\n')[0].slice(0, 55);
+      const ago = timeAgo(c.commit.author.date);
+      return `<a href="${c.html_url}" target="_blank" class="p-commit">
+        <span class="p-commit-sha">${sha}</span>
+        <span class="p-commit-msg">${msg}</span>
+        <span class="p-commit-time">${ago}</span>
+      </a>`;
+    }).join('');
+
+  } catch(e) {
+    container.innerHTML = '<span class="project-gh-none">— could not load</span>';
+  }
+}
+
+// Boot all GitHub feeds
+loadActivityFeed();
+loadProjectCommits(MAIN_REPO, 'commits-phishguard',   'pr-phishguard');
+loadProjectCommits(MAIN_REPO, 'commits-maildefender',  'pr-maildefender');
 
 // Terminal typewriter effect
 const lines = document.querySelectorAll('.terminal-line');
