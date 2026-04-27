@@ -1,4 +1,95 @@
 {
-  "generated_at": null,
-  "repos": {}
+  "generated_at": "2026-04-27T20:10:00.115Z",
+  "repos": {
+    "JeffreyCq/phishguard": {
+      "name": "phishguard",
+      "private": true,
+      "stars": 0,
+      "forks": 0,
+      "pushed_at": "2026-04-27T19:52:15Z",
+      "open_prs": 0,
+      "commits": [
+        {
+          "sha": "0cf48a9d5ec0f7307df76dff0d34566b1e697519",
+          "message": "docs: rewrite README for portfolio and repo documentation",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T19:52:14Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/0cf48a9d5ec0f7307df76dff0d34566b1e697519"
+        },
+        {
+          "sha": "0498b32e50a9fd54ce94baa2aaa9d33d98877c2a",
+          "message": "perf: optimize Ollama inference speed on CPU",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T18:50:25Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/0498b32e50a9fd54ce94baa2aaa9d33d98877c2a"
+        },
+        {
+          "sha": "b8057d438e8157086f06204471cc4982bc39ad94",
+          "message": "fix: footer credit text in English",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T18:42:07Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/b8057d438e8157086f06204471cc4982bc39ad94"
+        },
+        {
+          "sha": "08c3f93121e020255f3c22657d82047eb7c05df0",
+          "message": "feat: add spam detection, footer, and update API docs domain",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T18:39:30Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/08c3f93121e020255f3c22657d82047eb7c05df0"
+        },
+        {
+          "sha": "fbed0ce7bc274fe6c2c6e1c07cb36731eebdc977",
+          "message": "feat: add animated progress bar with analysis stage labels",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T18:30:18Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/fbed0ce7bc274fe6c2c6e1c07cb36731eebdc977"
+        }
+      ]
+    },
+    "JeffreyCq/portfolio": {
+      "name": "portfolio",
+      "private": false,
+      "stars": 0,
+      "forks": 0,
+      "pushed_at": "2026-04-27T20:02:23Z",
+      "open_prs": 0,
+      "commits": [
+        {
+          "sha": "72a335cc3b9af859804eb2fb2ee68b4139c85340",
+          "message": "feat: GitHub Actions commit feed with private repo support",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T20:02:21Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/72a335cc3b9af859804eb2fb2ee68b4139c85340"
+        },
+        {
+          "sha": "f080390fa36f83453470de7577b809f3f937a7a2",
+          "message": "update(maildefender): accurate description, stack and features",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T19:54:38Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/f080390fa36f83453470de7577b809f3f937a7a2"
+        },
+        {
+          "sha": "051504c409967b2a670e9f0e8e824ff37baead26",
+          "message": "feat: add Now section with live GitHub activity feed and enhanced project cards",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-27T19:42:09Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/051504c409967b2a670e9f0e8e824ff37baead26"
+        },
+        {
+          "sha": "e8e46b4f08ce7f2eb66bd8a9f92687f2122ada08",
+          "message": "Add MailDefender project to portfolio",
+          "author": "Jeffreycq",
+          "date": "2026-04-04T18:18:15Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/e8e46b4f08ce7f2eb66bd8a9f92687f2122ada08"
+        },
+        {
+          "sha": "c92d107e5bb5f879fef01b6ddc855d13d1b2e92a",
+          "message": "initial commit",
+          "author": "Jeffreycq",
+          "date": "2026-03-29T03:47:40Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/c92d107e5bb5f879fef01b6ddc855d13d1b2e92a"
+        }
+      ]
+    }
+  }
 }
