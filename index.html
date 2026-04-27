@@ -1134,14 +1134,16 @@ span[data-lang].active { display: inline; }
         </div>
         <div class="now-project-name">MailDefender</div>
         <p class="now-project-desc">
-          <span data-lang="en" class="active">AI-powered phishing email analyzer with SPF/DKIM/DMARC validation, VirusTotal & AbuseIPDB checks, and a Groq Llama 3.3 70B verdict engine. Weighted 0–100 risk score.</span>
-          <span data-lang="es">Analizador de phishing con IA — validación SPF/DKIM/DMARC, checks en VirusTotal y AbuseIPDB, y veredicto generado por Groq Llama 3.3 70B. Score de riesgo 0–100.</span>
+          <span data-lang="en" class="active">Full-stack phishing &amp; spam analysis platform — self-hosted, zero external AI costs. Multi-layer pipeline: RFC 5322 parsing, parallel threat intel (VirusTotal, AbuseIPDB, URLScan), and local LLM inference via Ollama (Qwen2.5 3B). Includes an async SMTP server so users can forward suspicious emails and receive an HTML analysis report in their inbox. Weighted 0–100 risk score from 13+ signals.</span>
+          <span data-lang="es">Plataforma full-stack de análisis de phishing y spam — self-hosted, sin costos de IA externos. Pipeline multicapa: parseo RFC 5322, threat intel paralela (VirusTotal, AbuseIPDB, URLScan) e inferencia local con Ollama (Qwen2.5 3B). Servidor SMTP async para reenviar emails sospechosos y recibir reportes HTML. Score 0–100 basado en 13+ señales.</span>
         </p>
         <div class="exp-tags" style="margin-bottom:1.2rem;">
           <span class="tag">FastAPI</span>
           <span class="tag">React</span>
-          <span class="tag">Groq AI</span>
+          <span class="tag">Ollama</span>
+          <span class="tag">Qwen2.5</span>
           <span class="tag">VirusTotal</span>
+          <span class="tag">aiosmtpd</span>
           <span class="tag">Docker</span>
         </div>
         <div class="now-project-links">
@@ -1494,11 +1496,11 @@ span[data-lang].active { display: inline; }
       <div class="project-body">
         <div class="project-name">MailDefender</div>
         <p class="project-desc">
-          <span data-lang="en" class="active">AI-powered phishing email analyzer. Upload or paste any email and get an instant threat report — SPF/DKIM/DMARC validation, URL & IP reputation checks via VirusTotal and AbuseIPDB, and a plain-English verdict powered by Groq Llama 3.3 70B with a weighted 0–100 risk score.</span>
-          <span data-lang="es">Analizador de emails de phishing con IA. Sube o pega cualquier correo y obtén un reporte de amenazas al instante — validación SPF/DKIM/DMARC, reputación de URLs e IPs con VirusTotal y AbuseIPDB, y un veredicto en lenguaje natural generado por Groq Llama 3.3 70B con score de riesgo 0–100.</span>
+          <span data-lang="en" class="active">Self-hosted phishing &amp; spam analysis platform with zero external AI costs. Paste or upload any email — get an instant report with SPF/DKIM/DMARC validation, parallel VirusTotal/AbuseIPDB/URLScan threat intel, and a local LLM verdict (Ollama + Qwen2.5 3B). Also supports email forwarding: send to scan@maildefender.xyz and receive an HTML report in your inbox. Weighted 0–100 risk score from 13+ signals.</span>
+          <span data-lang="es">Plataforma self-hosted de análisis de phishing y spam sin costos de IA externos. Pega o sube un correo — obtén validación SPF/DKIM/DMARC, threat intel paralela con VirusTotal/AbuseIPDB/URLScan y veredicto por LLM local (Ollama + Qwen2.5 3B). También acepta reenvío de emails: envía a scan@maildefender.xyz y recibe un reporte HTML. Score 0–100 con 13+ señales.</span>
         </p>
         <div class="exp-tags" style="margin-bottom:1rem;">
-          <span class="tag">FastAPI</span><span class="tag">React</span><span class="tag">Groq AI</span><span class="tag">VirusTotal</span><span class="tag">Docker</span>
+          <span class="tag">FastAPI</span><span class="tag">React</span><span class="tag">Ollama</span><span class="tag">Qwen2.5 3B</span><span class="tag">VirusTotal</span><span class="tag">aiosmtpd</span><span class="tag">Docker</span>
         </div>
         <div class="project-links">
           <a href="https://maildefender.xyz" target="_blank" class="project-link">↗ <span data-lang="en" class="active">Visit site</span><span data-lang="es">Ver sitio</span></a>
