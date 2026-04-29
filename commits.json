@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-28T23:57:07.383Z",
+  "generated_at": "2026-04-29T03:53:29.994Z",
   "repos": {
     "JeffreyCq/phishguard": {
       "name": "phishguard",
@@ -46,14 +46,73 @@
         }
       ]
     },
+    "JeffreyCq/wazuh-notifier": {
+      "name": "wazuh-notifier",
+      "private": false,
+      "stars": 0,
+      "forks": 0,
+      "pushed_at": "2026-04-29T02:13:19Z",
+      "open_prs": 0,
+      "commits": [
+        {
+          "sha": "565c07d0f5546b7136e02e4c1dfadb30af6cb951",
+          "message": "refactor: rebuild UI from scratch for visual consistency + add README",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T02:13:13Z",
+          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/565c07d0f5546b7136e02e4c1dfadb30af6cb951"
+        },
+        {
+          "sha": "905739a9524ccb657c1290b598f7fe2073a5d92c",
+          "message": "fix: make inputs transparent, move bg+border to container div",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T01:59:38Z",
+          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/905739a9524ccb657c1290b598f7fe2073a5d92c"
+        },
+        {
+          "sha": "4282d79355568d97caed7e4cf780659f67d6c07e",
+          "message": "fix: unify all modal inputs inside field-input-row container",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T01:57:14Z",
+          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/4282d79355568d97caed7e4cf780659f67d6c07e"
+        },
+        {
+          "sha": "2e493d5f9af6dd6ac5faf874fd0de6b810a20a8e",
+          "message": "fix: force dark inputs in Firefox with inset box-shadow",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T01:52:48Z",
+          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/2e493d5f9af6dd6ac5faf874fd0de6b810a20a8e"
+        },
+        {
+          "sha": "c1031519d662a51b56f6c64e3bc82046e699085f",
+          "message": "feat: use custom logo.png as extension icons",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T01:50:12Z",
+          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/c1031519d662a51b56f6c64e3bc82046e699085f"
+        }
+      ]
+    },
     "JeffreyCq/portfolio": {
       "name": "portfolio",
       "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-28T22:01:08Z",
+      "pushed_at": "2026-04-29T02:17:46Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "5cd7839518cd859ba3ec77e7f5011aa34e599112",
+          "message": "feat: add Wazuh Notifier project to portfolio and resume",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T02:17:32Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/5cd7839518cd859ba3ec77e7f5011aa34e599112"
+        },
+        {
+          "sha": "d0c59071fe971f3aa94525e575c5a93e3de26041",
+          "message": "chore: refresh commit feed [skip ci]",
+          "author": "github-actions[bot]",
+          "date": "2026-04-28T23:57:07Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/d0c59071fe971f3aa94525e575c5a93e3de26041"
+        },
         {
           "sha": "5531f26d1de5fccb2109800a301a5f9193003ba7",
           "message": "chore: refresh commit feed [skip ci]",
@@ -74,20 +133,6 @@
           "author": "github-actions[bot]",
           "date": "2026-04-28T18:20:04Z",
           "url": "https://github.com/JeffreyCq/portfolio/commit/8019207fec783f680075ec2cf2fb50b5a4cf5b4f"
-        },
-        {
-          "sha": "3dee8d21d66dd4f9118f645f26383cdeec039eb1",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-04-28T16:54:49Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/3dee8d21d66dd4f9118f645f26383cdeec039eb1"
-        },
-        {
-          "sha": "f94e00ffaadf0cac3167cbdc9757399cc029c72a",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-04-28T14:17:01Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/f94e00ffaadf0cac3167cbdc9757399cc029c72a"
         }
       ]
     }
