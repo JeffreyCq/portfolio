@@ -1,14 +1,35 @@
 {
-  "generated_at": "2026-04-29T14:04:43.007Z",
+  "generated_at": "2026-04-29T16:43:19.763Z",
   "repos": {
     "JeffreyCq/phishguard": {
       "name": "phishguard",
       "private": true,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-27T19:52:15Z",
+      "pushed_at": "2026-04-29T16:43:18Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "07f2b2abb6e42ec377c5d5351508f93d4dbc8085",
+          "message": "feat: replace Ollama with DistilBERT ML microservice",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T16:43:13Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/07f2b2abb6e42ec377c5d5351508f93d4dbc8085"
+        },
+        {
+          "sha": "2e0f1f638520bb79bfeb0e28f188e393f6c9e8e8",
+          "message": "refactor: move ml-classifier to external service",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T16:23:12Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/2e0f1f638520bb79bfeb0e28f188e393f6c9e8e8"
+        },
+        {
+          "sha": "4d311d84785e9c5973beb00b870480396b01d58f",
+          "message": "feat: add MailDefender ML classifier microservice",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T16:16:53Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/4d311d84785e9c5973beb00b870480396b01d58f"
+        },
         {
           "sha": "0cf48a9d5ec0f7307df76dff0d34566b1e697519",
           "message": "docs: rewrite README for portfolio and repo documentation",
@@ -22,27 +43,6 @@
           "author": "Jeffrey Cedeno",
           "date": "2026-04-27T18:50:25Z",
           "url": "https://github.com/JeffreyCq/phishguard/commit/0498b32e50a9fd54ce94baa2aaa9d33d98877c2a"
-        },
-        {
-          "sha": "b8057d438e8157086f06204471cc4982bc39ad94",
-          "message": "fix: footer credit text in English",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-27T18:42:07Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/b8057d438e8157086f06204471cc4982bc39ad94"
-        },
-        {
-          "sha": "08c3f93121e020255f3c22657d82047eb7c05df0",
-          "message": "feat: add spam detection, footer, and update API docs domain",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-27T18:39:30Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/08c3f93121e020255f3c22657d82047eb7c05df0"
-        },
-        {
-          "sha": "fbed0ce7bc274fe6c2c6e1c07cb36731eebdc977",
-          "message": "feat: add animated progress bar with analysis stage labels",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-27T18:30:18Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/fbed0ce7bc274fe6c2c6e1c07cb36731eebdc977"
         }
       ]
     },
@@ -96,9 +96,16 @@
       "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-29T11:40:48Z",
+      "pushed_at": "2026-04-29T14:04:44Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "60db2c88af6d61074ee8ed1cea94de35174ce3a1",
+          "message": "chore: refresh commit feed [skip ci]",
+          "author": "github-actions[bot]",
+          "date": "2026-04-29T14:04:44Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/60db2c88af6d61074ee8ed1cea94de35174ce3a1"
+        },
         {
           "sha": "32f865e477229fc333bf55d622b7cc3c6c9e0cbf",
           "message": "chore: refresh commit feed [skip ci]",
@@ -126,13 +133,6 @@
           "author": "github-actions[bot]",
           "date": "2026-04-29T03:53:30Z",
           "url": "https://github.com/JeffreyCq/portfolio/commit/70b835a1db8810e15240c19ed68ee8f10e565b35"
-        },
-        {
-          "sha": "5cd7839518cd859ba3ec77e7f5011aa34e599112",
-          "message": "feat: add Wazuh Notifier project to portfolio and resume",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T02:17:32Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/5cd7839518cd859ba3ec77e7f5011aa34e599112"
         }
       ]
     }
