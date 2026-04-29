@@ -1488,9 +1488,42 @@ span[data-lang].active { display: inline; }
       </div>
     </div>
 
-    <div class="project-card fade-in" data-repo="JeffreyCq/phishguard">
+    <div class="project-card fade-in" data-repo="JeffreyCq/wazuh-notifier">
       <div class="project-header">
         <span class="project-num">04</span>
+        <span class="project-status status-live">● LIVE</span>
+      </div>
+      <div class="project-body">
+        <div class="project-name">Wazuh Notifier</div>
+        <p class="project-desc">
+          <span data-lang="en" class="active">A cross-browser extension (Chrome &amp; Firefox) that monitors Wazuh SIEM clusters in the background and delivers real-time desktop notifications for critical security alerts — no dashboard required. Supports self-hosted OpenSearch deployments and Wazuh Cloud, multi-cluster management, agent filtering, alert history export (JSON/CSV), and a dark-themed alert dashboard.</span>
+          <span data-lang="es">Extensión cross-browser (Chrome y Firefox) que monitorea clusters de Wazuh SIEM en segundo plano y envía notificaciones de escritorio en tiempo real para alertas críticas — sin tener el dashboard abierto. Compatible con OpenSearch self-hosted y Wazuh Cloud, gestión multi-cluster, filtros por agente, exportación del historial (JSON/CSV) y panel de alertas con tema oscuro.</span>
+        </p>
+        <div class="exp-tags" style="margin-bottom:1rem;">
+          <span class="tag">TypeScript</span><span class="tag">Manifest V3</span><span class="tag">WebExtension API</span><span class="tag">OpenSearch</span><span class="tag">webpack</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/JeffreyCq/wazuh-notifier" target="_blank" class="project-link">↗ GitHub</a>
+        </div>
+        <div class="project-gh">
+          <div class="project-gh-header">
+            <span class="project-gh-label">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+              <span data-lang="en" class="active">commits · wazuh-notifier</span>
+              <span data-lang="es">commits · wazuh-notifier</span>
+            </span>
+            <span class="project-gh-pr" id="pr-wazuh-notifier" style="display:none;"></span>
+          </div>
+          <div class="project-commits" id="commits-wazuh-notifier">
+            <span class="project-gh-loading">loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card fade-in" data-repo="JeffreyCq/phishguard">
+      <div class="project-header">
+        <span class="project-num">05</span>
         <span class="project-status status-live">● LIVE</span>
       </div>
       <div class="project-body">
@@ -1832,8 +1865,9 @@ async function loadProjectCommits(repo, commitsId, prId) {
 
 // Boot all feeds
 loadActivityFeed();
-loadProjectCommits('JeffreyCq/phishguard', 'commits-phishguard',  'pr-phishguard');
-loadProjectCommits('JeffreyCq/phishguard', 'commits-maildefender','pr-maildefender');
+loadProjectCommits('JeffreyCq/phishguard',      'commits-phishguard',    'pr-phishguard');
+loadProjectCommits('JeffreyCq/wazuh-notifier',  'commits-wazuh-notifier','pr-wazuh-notifier');
+loadProjectCommits('JeffreyCq/phishguard',      'commits-maildefender',  'pr-maildefender');
 
 // Terminal typewriter effect
 const lines = document.querySelectorAll('.terminal-line');

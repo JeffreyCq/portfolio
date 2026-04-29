@@ -13,6 +13,7 @@ const path  = require('path');
 // ── CONFIG ─────────────────────────────────────────────────────────────────
 const REPOS = [
   'JeffreyCq/phishguard',
+  'JeffreyCq/wazuh-notifier',
   'JeffreyCq/portfolio',
   // Add private repos here, e.g.:
   // 'JeffreyCq/learn-wazuh',
