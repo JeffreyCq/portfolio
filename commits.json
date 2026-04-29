@@ -1,14 +1,35 @@
 {
-  "generated_at": "2026-04-29T16:43:19.763Z",
+  "generated_at": "2026-04-29T18:13:36.949Z",
   "repos": {
     "JeffreyCq/phishguard": {
       "name": "phishguard",
       "private": true,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-29T16:43:18Z",
+      "pushed_at": "2026-04-29T17:16:29Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "5f64e7ebf351e60c9325b9a2c3c9b180a1c280f9",
+          "message": "ui: replace header icon with custom MailDefender logo",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T17:16:25Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/5f64e7ebf351e60c9325b9a2c3c9b180a1c280f9"
+        },
+        {
+          "sha": "8ef46635ead655dae8f49b382d3cdc71da4a9ef8",
+          "message": "docs: update API docs and README for DistilBERT microservice",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T16:53:55Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/8ef46635ead655dae8f49b382d3cdc71da4a9ef8"
+        },
+        {
+          "sha": "d4d062006341be523b12235e861664debd9bdd29",
+          "message": "ui: update footer with DistilBERT/ONNX stack and AI Enthusiast title",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-29T16:48:23Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/d4d062006341be523b12235e861664debd9bdd29"
+        },
         {
           "sha": "07f2b2abb6e42ec377c5d5351508f93d4dbc8085",
           "message": "feat: replace Ollama with DistilBERT ML microservice",
@@ -22,27 +43,6 @@
           "author": "Jeffrey Cedeno",
           "date": "2026-04-29T16:23:12Z",
           "url": "https://github.com/JeffreyCq/phishguard/commit/2e0f1f638520bb79bfeb0e28f188e393f6c9e8e8"
-        },
-        {
-          "sha": "4d311d84785e9c5973beb00b870480396b01d58f",
-          "message": "feat: add MailDefender ML classifier microservice",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T16:16:53Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/4d311d84785e9c5973beb00b870480396b01d58f"
-        },
-        {
-          "sha": "0cf48a9d5ec0f7307df76dff0d34566b1e697519",
-          "message": "docs: rewrite README for portfolio and repo documentation",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-27T19:52:14Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/0cf48a9d5ec0f7307df76dff0d34566b1e697519"
-        },
-        {
-          "sha": "0498b32e50a9fd54ce94baa2aaa9d33d98877c2a",
-          "message": "perf: optimize Ollama inference speed on CPU",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-27T18:50:25Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/0498b32e50a9fd54ce94baa2aaa9d33d98877c2a"
         }
       ]
     },
@@ -96,9 +96,16 @@
       "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-29T14:04:44Z",
+      "pushed_at": "2026-04-29T16:43:21Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "c311a7b4c84c7060ac11d7e569a1019e793f9bf9",
+          "message": "chore: refresh commit feed [skip ci]",
+          "author": "github-actions[bot]",
+          "date": "2026-04-29T16:43:20Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/c311a7b4c84c7060ac11d7e569a1019e793f9bf9"
+        },
         {
           "sha": "60db2c88af6d61074ee8ed1cea94de35174ce3a1",
           "message": "chore: refresh commit feed [skip ci]",
@@ -126,13 +133,6 @@
           "author": "github-actions[bot]",
           "date": "2026-04-29T06:26:30Z",
           "url": "https://github.com/JeffreyCq/portfolio/commit/ace32a16b7f9b82e17226e4501a96290a6b40f68"
-        },
-        {
-          "sha": "70b835a1db8810e15240c19ed68ee8f10e565b35",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-04-29T03:53:30Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/70b835a1db8810e15240c19ed68ee8f10e565b35"
         }
       ]
     }
