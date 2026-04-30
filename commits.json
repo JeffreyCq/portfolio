@@ -1,48 +1,48 @@
 {
-  "generated_at": "2026-04-30T14:03:27.102Z",
+  "generated_at": "2026-04-30T16:22:18.387Z",
   "repos": {
     "JeffreyCq/phishguard": {
       "name": "phishguard",
       "private": true,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-30T00:39:47Z",
+      "pushed_at": "2026-04-30T16:19:56Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "6243846b18098a639738579c2ca3b3120b071197",
+          "message": "docs: remove email forwarding and admin key sections from API docs",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-30T16:19:50Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/6243846b18098a639738579c2ca3b3120b071197"
+        },
+        {
+          "sha": "7afc7436cc5e12e63586b755e47ab0b720e8487e",
+          "message": "feat: add Open Graph and Twitter Card meta tags for link previews",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-30T15:08:04Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/7afc7436cc5e12e63586b755e47ab0b720e8487e"
+        },
+        {
+          "sha": "110038f365d9918a8ba2a7e23ad8b7c45af6aeed",
+          "message": "docs: update API docs with key acquisition, rate limits, tabbed code examples",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-30T14:42:06Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/110038f365d9918a8ba2a7e23ad8b7c45af6aeed"
+        },
+        {
+          "sha": "d4983ad896cb2d85151e5ae119732bcb4c068be6",
+          "message": "feat: per-key API key management with SQLite and rate limiting",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-30T14:28:45Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/d4983ad896cb2d85151e5ae119732bcb4c068be6"
+        },
         {
           "sha": "c1a29c8bceb8eb0961f8e8d7b8733b85bdc56b7c",
           "message": "feat: feedback collection + periodic retraining pipeline (Option A)",
           "author": "Jeffrey Cedeno",
           "date": "2026-04-30T00:39:41Z",
           "url": "https://github.com/JeffreyCq/phishguard/commit/c1a29c8bceb8eb0961f8e8d7b8733b85bdc56b7c"
-        },
-        {
-          "sha": "83b42758262d85a89b84579d06830c34addb1dc4",
-          "message": "ui: revert header to logomd.png, replace ShieldAlert with white Mail icon",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T00:27:13Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/83b42758262d85a89b84579d06830c34addb1dc4"
-        },
-        {
-          "sha": "c6de7e4285ea057b4a2be10ffe13f70fc4bb6edc",
-          "message": "ui: replace header badge with white envelope icon, white API docs icons",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T00:23:59Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/c6de7e4285ea057b4a2be10ffe13f70fc4bb6edc"
-        },
-        {
-          "sha": "5f64e7ebf351e60c9325b9a2c3c9b180a1c280f9",
-          "message": "ui: replace header icon with custom MailDefender logo",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T17:16:25Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/5f64e7ebf351e60c9325b9a2c3c9b180a1c280f9"
-        },
-        {
-          "sha": "8ef46635ead655dae8f49b382d3cdc71da4a9ef8",
-          "message": "docs: update API docs and README for DistilBERT microservice",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T16:53:55Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/8ef46635ead655dae8f49b382d3cdc71da4a9ef8"
         }
       ]
     },
@@ -96,9 +96,16 @@
       "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-30T11:39:47Z",
+      "pushed_at": "2026-04-30T14:03:33Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "b9e3bfd0f8172a53ae4a923a4abca9d310c34424",
+          "message": "chore: refresh commit feed [skip ci]",
+          "author": "github-actions[bot]",
+          "date": "2026-04-30T14:03:32Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/b9e3bfd0f8172a53ae4a923a4abca9d310c34424"
+        },
         {
           "sha": "f8533d2c769e954f739e953344cb867d9ba9d13a",
           "message": "chore: refresh commit feed [skip ci]",
@@ -126,13 +133,6 @@
           "author": "github-actions[bot]",
           "date": "2026-04-30T03:51:26Z",
           "url": "https://github.com/JeffreyCq/portfolio/commit/b308887714958a9dcb2462afb3cd9d347c3d4adb"
-        },
-        {
-          "sha": "e5ea61d6530f1caa4e3dfc7af40683005611ad62",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-04-29T23:56:53Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/e5ea61d6530f1caa4e3dfc7af40683005611ad62"
         }
       ]
     }
