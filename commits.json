@@ -1,14 +1,28 @@
 {
-  "generated_at": "2026-04-30T16:22:18.387Z",
+  "generated_at": "2026-04-30T18:12:03.420Z",
   "repos": {
     "JeffreyCq/phishguard": {
       "name": "phishguard",
       "private": true,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-30T16:19:56Z",
+      "pushed_at": "2026-04-30T17:30:49Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "503babe3fe0497a4801db1860754d5210695eb56",
+          "message": "feat: add usage tracking and admin stats page",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-30T17:30:41Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/503babe3fe0497a4801db1860754d5210695eb56"
+        },
+        {
+          "sha": "c8bde9d20fdc12f66ec5a7eb9975fd553f2254e1",
+          "message": "fix: replace undefined address variable in health CodeBlock",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-04-30T16:22:53Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/c8bde9d20fdc12f66ec5a7eb9975fd553f2254e1"
+        },
         {
           "sha": "6243846b18098a639738579c2ca3b3120b071197",
           "message": "docs: remove email forwarding and admin key sections from API docs",
@@ -29,20 +43,6 @@
           "author": "Jeffrey Cedeno",
           "date": "2026-04-30T14:42:06Z",
           "url": "https://github.com/JeffreyCq/phishguard/commit/110038f365d9918a8ba2a7e23ad8b7c45af6aeed"
-        },
-        {
-          "sha": "d4983ad896cb2d85151e5ae119732bcb4c068be6",
-          "message": "feat: per-key API key management with SQLite and rate limiting",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T14:28:45Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/d4983ad896cb2d85151e5ae119732bcb4c068be6"
-        },
-        {
-          "sha": "c1a29c8bceb8eb0961f8e8d7b8733b85bdc56b7c",
-          "message": "feat: feedback collection + periodic retraining pipeline (Option A)",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T00:39:41Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/c1a29c8bceb8eb0961f8e8d7b8733b85bdc56b7c"
         }
       ]
     },
@@ -96,9 +96,16 @@
       "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-30T14:03:33Z",
+      "pushed_at": "2026-04-30T16:22:19Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "d555e0c68acbe59fc9a28a9575f54f50d710bafd",
+          "message": "chore: refresh commit feed [skip ci]",
+          "author": "github-actions[bot]",
+          "date": "2026-04-30T16:22:19Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/d555e0c68acbe59fc9a28a9575f54f50d710bafd"
+        },
         {
           "sha": "b9e3bfd0f8172a53ae4a923a4abca9d310c34424",
           "message": "chore: refresh commit feed [skip ci]",
@@ -126,13 +133,6 @@
           "author": "github-actions[bot]",
           "date": "2026-04-30T06:29:54Z",
           "url": "https://github.com/JeffreyCq/portfolio/commit/5964d11120c4bdc6fbd374cf009aa0d0398848ec"
-        },
-        {
-          "sha": "b308887714958a9dcb2462afb3cd9d347c3d4adb",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-04-30T03:51:26Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/b308887714958a9dcb2462afb3cd9d347c3d4adb"
         }
       ]
     }
