@@ -1,14 +1,28 @@
 {
-  "generated_at": "2026-05-01T16:03:09.379Z",
+  "generated_at": "2026-05-01T18:00:28.389Z",
   "repos": {
     "JeffreyCq/phishguard": {
       "name": "phishguard",
       "private": true,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-30T17:30:49Z",
+      "pushed_at": "2026-05-01T17:47:58Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "887b256ebca623dc865d6a0d8271cc385886a206",
+          "message": "fix(nginx): explicit locations for sitemap.xml and robots.txt",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-05-01T17:47:53Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/887b256ebca623dc865d6a0d8271cc385886a206"
+        },
+        {
+          "sha": "e436bbaebcacb0ca65f4509e6497b8bea4380b8f",
+          "message": "seo: add structured data, hero section, sitemap, robots.txt",
+          "author": "Jeffrey Cedeno",
+          "date": "2026-05-01T17:06:27Z",
+          "url": "https://github.com/JeffreyCq/phishguard/commit/e436bbaebcacb0ca65f4509e6497b8bea4380b8f"
+        },
         {
           "sha": "503babe3fe0497a4801db1860754d5210695eb56",
           "message": "feat: add usage tracking and admin stats page",
@@ -29,20 +43,6 @@
           "author": "Jeffrey Cedeno",
           "date": "2026-04-30T16:19:50Z",
           "url": "https://github.com/JeffreyCq/phishguard/commit/6243846b18098a639738579c2ca3b3120b071197"
-        },
-        {
-          "sha": "7afc7436cc5e12e63586b755e47ab0b720e8487e",
-          "message": "feat: add Open Graph and Twitter Card meta tags for link previews",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T15:08:04Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/7afc7436cc5e12e63586b755e47ab0b720e8487e"
-        },
-        {
-          "sha": "110038f365d9918a8ba2a7e23ad8b7c45af6aeed",
-          "message": "docs: update API docs with key acquisition, rate limits, tabbed code examples",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T14:42:06Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/110038f365d9918a8ba2a7e23ad8b7c45af6aeed"
         }
       ]
     },
@@ -96,9 +96,16 @@
       "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-05-01T14:58:38Z",
+      "pushed_at": "2026-05-01T16:03:10Z",
       "open_prs": 0,
       "commits": [
+        {
+          "sha": "3c94f108d7132fc359a27dc059cf94dcbd6d7c4c",
+          "message": "chore: refresh commit feed [skip ci]",
+          "author": "github-actions[bot]",
+          "date": "2026-05-01T16:03:10Z",
+          "url": "https://github.com/JeffreyCq/portfolio/commit/3c94f108d7132fc359a27dc059cf94dcbd6d7c4c"
+        },
         {
           "sha": "6b076e90bb4ece05d0cb1325b7eecc57e8da35d7",
           "message": "chore: refresh commit feed [skip ci]",
@@ -126,13 +133,6 @@
           "author": "github-actions[bot]",
           "date": "2026-05-01T09:02:52Z",
           "url": "https://github.com/JeffreyCq/portfolio/commit/0e70799a30db18f1262a7ad3856408486882934c"
-        },
-        {
-          "sha": "911b8572efec3cf34e5d0acccfcc502be38342ea",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-05-01T06:38:54Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/911b8572efec3cf34e5d0acccfcc502be38342ea"
         }
       ]
     }
