@@ -1,140 +1,26 @@
 {
-  "generated_at": "2026-05-27T19:27:16.214Z",
+  "generated_at": "2026-05-27T21:58:38.050Z",
   "repos": {
     "JeffreyCq/phishguard": {
-      "name": "phishguard",
-      "private": true,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-05-01T17:47:58Z",
+      "pushed_at": null,
       "open_prs": 0,
-      "commits": [
-        {
-          "sha": "887b256ebca623dc865d6a0d8271cc385886a206",
-          "message": "fix(nginx): explicit locations for sitemap.xml and robots.txt",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-05-01T17:47:53Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/887b256ebca623dc865d6a0d8271cc385886a206"
-        },
-        {
-          "sha": "e436bbaebcacb0ca65f4509e6497b8bea4380b8f",
-          "message": "seo: add structured data, hero section, sitemap, robots.txt",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-05-01T17:06:27Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/e436bbaebcacb0ca65f4509e6497b8bea4380b8f"
-        },
-        {
-          "sha": "503babe3fe0497a4801db1860754d5210695eb56",
-          "message": "feat: add usage tracking and admin stats page",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T17:30:41Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/503babe3fe0497a4801db1860754d5210695eb56"
-        },
-        {
-          "sha": "c8bde9d20fdc12f66ec5a7eb9975fd553f2254e1",
-          "message": "fix: replace undefined address variable in health CodeBlock",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T16:22:53Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/c8bde9d20fdc12f66ec5a7eb9975fd553f2254e1"
-        },
-        {
-          "sha": "6243846b18098a639738579c2ca3b3120b071197",
-          "message": "docs: remove email forwarding and admin key sections from API docs",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-30T16:19:50Z",
-          "url": "https://github.com/JeffreyCq/phishguard/commit/6243846b18098a639738579c2ca3b3120b071197"
-        }
-      ]
+      "commits": []
     },
     "JeffreyCq/wazuh-notifier": {
-      "name": "wazuh-notifier",
-      "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-04-29T02:13:19Z",
+      "pushed_at": null,
       "open_prs": 0,
-      "commits": [
-        {
-          "sha": "565c07d0f5546b7136e02e4c1dfadb30af6cb951",
-          "message": "refactor: rebuild UI from scratch for visual consistency + add README",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T02:13:13Z",
-          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/565c07d0f5546b7136e02e4c1dfadb30af6cb951"
-        },
-        {
-          "sha": "905739a9524ccb657c1290b598f7fe2073a5d92c",
-          "message": "fix: make inputs transparent, move bg+border to container div",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T01:59:38Z",
-          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/905739a9524ccb657c1290b598f7fe2073a5d92c"
-        },
-        {
-          "sha": "4282d79355568d97caed7e4cf780659f67d6c07e",
-          "message": "fix: unify all modal inputs inside field-input-row container",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T01:57:14Z",
-          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/4282d79355568d97caed7e4cf780659f67d6c07e"
-        },
-        {
-          "sha": "2e493d5f9af6dd6ac5faf874fd0de6b810a20a8e",
-          "message": "fix: force dark inputs in Firefox with inset box-shadow",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T01:52:48Z",
-          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/2e493d5f9af6dd6ac5faf874fd0de6b810a20a8e"
-        },
-        {
-          "sha": "c1031519d662a51b56f6c64e3bc82046e699085f",
-          "message": "feat: use custom logo.png as extension icons",
-          "author": "Jeffrey Cedeno",
-          "date": "2026-04-29T01:50:12Z",
-          "url": "https://github.com/JeffreyCq/wazuh-notifier/commit/c1031519d662a51b56f6c64e3bc82046e699085f"
-        }
-      ]
+      "commits": []
     },
     "JeffreyCq/portfolio": {
-      "name": "portfolio",
-      "private": false,
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-05-27T16:41:22Z",
+      "pushed_at": null,
       "open_prs": 0,
-      "commits": [
-        {
-          "sha": "a8170661cbd138fd294a69994bd1c9a74849208b",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-05-27T16:41:21Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/a8170661cbd138fd294a69994bd1c9a74849208b"
-        },
-        {
-          "sha": "f12bb8b84a19b75df0e09d9b00b33443bd2e7326",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-05-27T12:57:20Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/f12bb8b84a19b75df0e09d9b00b33443bd2e7326"
-        },
-        {
-          "sha": "4616d3c4d9048e66e27970f247440175c817c5e2",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-05-27T09:57:22Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/4616d3c4d9048e66e27970f247440175c817c5e2"
-        },
-        {
-          "sha": "2cd359b090124340b9a9c84ef4b557d5b7b63b9c",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-05-27T05:18:18Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/2cd359b090124340b9a9c84ef4b557d5b7b63b9c"
-        },
-        {
-          "sha": "c98744b80b128d65e67c2c41e0ea10356e9d8018",
-          "message": "chore: refresh commit feed [skip ci]",
-          "author": "github-actions[bot]",
-          "date": "2026-05-27T00:08:33Z",
-          "url": "https://github.com/JeffreyCq/portfolio/commit/c98744b80b128d65e67c2c41e0ea10356e9d8018"
-        }
-      ]
+      "commits": []
     }
   }
 }
