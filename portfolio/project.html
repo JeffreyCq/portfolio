@@ -583,6 +583,44 @@ details.workflow-card[open] summary::before {
   font-family: var(--mono);
 }
 
+/* ── Store availability ── */
+.store-availability-note {
+  font-size: 14px;
+  color: var(--ink2);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+.store-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.store-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface, #fafafa);
+  opacity: 0.65;
+  cursor: default;
+  user-select: none;
+}
+.store-badge-icon { font-size: 24px; line-height: 1; }
+.store-badge-sub {
+  font-size: 10px;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--mono);
+}
+.store-badge-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink1);
+}
+
 /* ── Code inline ── */
 code {
   font-family: var(--mono);
@@ -768,6 +806,7 @@ code {
     if (p.testing) items.push({ id: 'sec-testing', label: 'Testing' });
     if (p.images && p.images.length) items.push({ id: 'sec-gallery', label: 'Gallery' });
     if (p.nextSteps && p.nextSteps.length) items.push({ id: 'sec-next', label: "What's Next" });
+    if (p.downloads) items.push({ id: 'sec-downloads', label: 'Download' });
     return items;
   }
 
@@ -914,6 +953,25 @@ code {
         <div class="proj-section" id="sec-next">
           <div class="proj-section-title">What I'd Do Next</div>
           <ul class="next-list">${p.nextSteps.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>`;
+    }
+
+    // Downloads / store availability
+    if (p.downloads) {
+      const icons = { windows: '⊞', mac: '', linux: '🐧', web: '🌐' };
+      const badges = (p.downloads.stores || []).map(s => `
+        <div class="store-badge">
+          <span class="store-badge-icon">${icons[s.platform] || '📦'}</span>
+          <div>
+            <div class="store-badge-sub">Próximamente en</div>
+            <div class="store-badge-name">${s.name}</div>
+          </div>
+        </div>`).join('');
+      html += `
+        <div class="proj-section" id="sec-downloads">
+          <div class="proj-section-title">Descarga</div>
+          <p class="store-availability-note">${p.downloads.note}</p>
+          <div class="store-badges">${badges}</div>
         </div>`;
     }
 

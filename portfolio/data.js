@@ -787,6 +787,21 @@ const PROJECTS = [
       },
     ],
 
+    images: [
+      { src: "img/jam-json-modifier/screen-1.png", alt: "JAM welcome screen — recent files and keyboard shortcuts" },
+      { src: "img/jam-json-modifier/screen-2.png", alt: "JAM editor — Monaco JSON editor with live tree view" },
+      { src: "img/jam-json-modifier/screen-3.png", alt: "JAM Transform menu — Format, Minify, Repair, AI Repair" },
+      { src: "img/jam-json-modifier/screen-4.png", alt: "JAM editor in green theme mode" },
+    ],
+
+    downloads: {
+      note: "JAM será gratuito. Próximamente disponible para descarga en las tiendas oficiales de aplicaciones.",
+      stores: [
+        { name: "Microsoft Store", platform: "windows" },
+        { name: "Mac App Store", platform: "mac" },
+      ],
+    },
+
     nextSteps: [
       "Add JSON-to-TypeScript type generation",
       "Add JSONPath query runner with live results panel",
