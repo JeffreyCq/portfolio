@@ -982,7 +982,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/wazuh-easylogger/cover.png",
     date: "Sep 2026",
 
     overview: `Python library that eliminates the manual configuration friction of integrating custom application logs into Wazuh SIEM. Running the interactive wizard (<code>python -m easylogger.wizard</code>) generates a ready-to-use <code>log_config.yaml</code>, the exact <code>ossec.conf</code> block to paste into the Wazuh Manager, a custom JSON decoder, and a step-by-step <code>GUIDE.md</code> — all tailored to the app's transport and format choices.`,
@@ -1044,7 +1044,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/confluence-kb-tool/cover.png",
     date: "Sep 2026",
     repoUrl: "https://github.com/JeffreyCq/confluence-kb-tool",
 
