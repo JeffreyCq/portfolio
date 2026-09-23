@@ -394,6 +394,10 @@ nav {
     return `<div class="card-cover-placeholder" style="background:${c.color};opacity:0.85;">${c.label}</div>`;
   }
 
+  window._coverErr = function(el, cat) {
+    el.outerHTML = imgPlaceholder(cat);
+  };
+
   function renderCard(p) {
     const cat = getCategoryBySlug(p.category);
     const tagsHtml = (p.tags || []).slice(0, 4).map(t =>
@@ -401,7 +405,7 @@ nav {
     ).join('');
 
     const coverHtml = p.cover
-      ? `<img class="card-cover" src="${p.cover}" alt="${p.title} cover" onerror="this.outerHTML=\`${imgPlaceholder(p.category).replace(/`/g, '\\`')}\`">`
+      ? `<img class="card-cover" src="${p.cover}" alt="${p.title} cover" onerror="_coverErr(this,'${p.category}')">`
       : imgPlaceholder(p.category);
 
     return `
