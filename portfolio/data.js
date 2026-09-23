@@ -688,7 +688,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/quinstreet-jira-dashboard/cover.png",
     date: "Sep 2026",
 
     note: "Built for internal use at HomeBuddy (Quinstreet). Deployed to Atlassian Forge infrastructure.",
