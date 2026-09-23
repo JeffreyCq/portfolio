@@ -1328,7 +1328,7 @@ This convention was established in the Grafana alert rules: every rule that moni
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/it-support-kb-power-automate/cover.png",
     date: "Jun 2026",
 
     overview: `An AI-powered Q&A bot for internal IT Support, built entirely within the Microsoft 365 ecosystem — no external APIs, no Azure OpenAI subscription, no custom backend.
