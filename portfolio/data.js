@@ -1050,6 +1050,146 @@ Every CTE join and anti-spam lock uses group_key, so user-based and IP-based eve
       "Migrate alert routing from Power Automate relay to direct Teams Graph API calls",
     ],
   },
+
+  // ── n8n: Wazuh Weekly SOC Report ─────────────────────────────────────────
+  {
+    title: "Wazuh Weekly SOC Report",
+    slug: "wazuh-weekly-soc-report",
+    category: "n8n",
+    tags: ["wazuh", "siem", "soc", "reporting", "postgresql", "html-dashboard", "email-automation"],
+    summary: "Scheduled n8n workflow that queries a week of Wazuh Active Response events from PostgreSQL, builds a self-contained interactive HTML dashboard (KPI grid, trend chart, MITRE tactics breakdown, paginated log), and delivers it as an email attachment every Monday via Power Automate — no file server or external storage required.",
+    role: "Design & build (solo)",
+    tools: ["n8n", "JavaScript", "PostgreSQL", "Power Automate", "HTML/CSS", "Wazuh"],
+    status: "Completed",
+    published: true,
+    featured: false,
+    cover: null,
+    date: "Sep 2026",
+
+    overview: `A weekly reporting workflow that turns raw Wazuh Active Response logs into a polished security dashboard delivered to email every Monday at 8am.
+
+The workflow queries 7 days of events from the same \`ar_alerts_log\` table used by the real-time alerting pipeline, processes them into 6 KPIs and a ranked findings list, then injects the data into a self-contained HTML dashboard. The dashboard is base64-encoded and sent as an email attachment via Power Automate — no Azure blob storage, no CDN, no file server.
+
+Recipients get a single \`.html\` file they can open locally in any browser. The dashboard renders entirely client-side: interactive filters, sortable tables, trend charts, and MITRE ATT&CK breakdowns all work offline from the attachment.`,
+
+    architectureMermaid: `flowchart TD
+    CRON["Schedule Trigger\\nEvery Monday 8am"] --> PG["PostgreSQL\\n7-day window from ar_alerts_log\\nincludes is_first_seen flag\\nreturns full JSON array"]
+    PG --> CODE["Build HTML Dashboard\\n(Code node)\\nDecode base64 template\\nInject alert JSON into template\\nCompute 6 KPIs + findings ranking\\nBase64-encode final HTML"]
+    CODE --> HTTP["HTTP Request\\nPOST to Power Automate\\nfilename + base64 file\\n+ stats summary body"]
+    HTTP --> PA["Power Automate\\nOffice 365 Outlook connector"]
+    PA --> EMAIL["Email + HTML Attachment\\nwazuh-weekly-report-YYYY-MM-DD.html\\nself-contained interactive dashboard"]`,
+
+    components: [
+      {
+        id: "sql-query",
+        title: "PostgreSQL Query — 7-Day Window",
+        type: "list",
+        description: "Pulls all events from the past 7 days and enriches each row with an `is_first_seen` flag using a JOIN against the full historical minimum.",
+        items: [
+          "<code>window_alerts</code> CTE — all rows from <code>ar_alerts_log</code> with <code>created_at >= now() - interval '7 days'</code>",
+          "<code>first_seen</code> CTE — <code>MIN(created_at)</code> per <code>group_key</code> across the entire table (not just the window)",
+          "<code>is_first_seen</code> flag — true when the group_key's first-ever appearance falls within the 7-day window",
+          "Returns all event fields including MITRE data, command (BLOCKED/UNBLOCKED), agent, source info",
+          "Full result set wrapped in <code>json_agg</code> → single JSON column for the Code node to receive",
+        ],
+      },
+      {
+        id: "kpis",
+        title: "6 KPIs Computed in Code Node",
+        type: "list",
+        description: "The Code node aggregates the raw event list into the summary numbers shown in the dashboard header and sent in the email body.",
+        items: [
+          "<strong>Total events</strong> — raw count of all AR events in the 7-day window",
+          "<strong>Unique sources</strong> — distinct <code>group_key</code> values (IPs + users)",
+          "<strong>Blocked</strong> — events where <code>command === 'BLOCKED'</code>",
+          "<strong>Critical (≥ 12)</strong> — events with <code>rule_level ≥ 12</code>",
+          "<strong>Compromised accounts</strong> — group_keys that triggered rule 40112 (valid login after brute-force)",
+          "<strong>New sources</strong> — group_keys appearing for the first time this week (<code>is_first_seen = true</code>)",
+        ],
+      },
+      {
+        id: "findings",
+        title: "Findings Ranking — Priority Order",
+        type: "list",
+        description: "Each unique attacker (group_key) is evaluated and emitted as a finding if it meets any threshold. Findings are sorted by rank then hit count.",
+        items: [
+          "🚨 <strong>rank 0 — Account Compromise:</strong> group_key has <code>hasAccountHit = true</code> (rule 40112 fired)",
+          "🔥 <strong>rank 1 — High-Severity:</strong> level ≥ 12 event (not rule 40112)",
+          "🔴 <strong>rank 1 — Sustained Attack:</strong> ≥ 15 hits from same source",
+          "🧩 <strong>rank 2 — Multi-Stage:</strong> ≥ 2 distinct MITRE techniques from same source",
+          "🟠 <strong>rank 2 — Repeated Attacks:</strong> ≥ 10 hits from same source",
+          "🎯 <strong>rank 2 — Coordinated Attack:</strong> ≥ 5 distinct sources hitting same host within 90-minute sliding window",
+        ],
+      },
+      {
+        id: "dashboard",
+        title: "SOC Radar — Self-Contained HTML Dashboard",
+        type: "list",
+        description: "The dashboard is a fully static HTML file with the week's alert data embedded as JSON. No server needed after delivery — all rendering, filtering, and charting happens in the browser.",
+        items: [
+          "<strong>KPI grid</strong> — 6 stat cards with severity-coded colors",
+          "<strong>Investigation priority feed</strong> — ranked findings list generated server-side",
+          "<strong>Events per day bar chart</strong> — inline SVG, no chart library dependency",
+          "<strong>MITRE ATT&CK tactics chart</strong> — tactic distribution with 7 color slots",
+          "<strong>Top offending sources table</strong> — sortable, with hit count and max severity",
+          "<strong>Most targeted hosts table</strong> — agent names with event counts",
+          "<strong>Full log table</strong> — paginated, all fields, with search and 4-dropdown filter bar (days / severity / command / priority)",
+          "<strong>Agent chips</strong> — quick filter by hostname",
+          "<strong>Export / Print</strong> — native browser print, no PDF library",
+          "<strong>Copy summary for Teams</strong> — one-click copy of KPI summary text",
+          "Light + dark mode via <code>prefers-color-scheme</code> + manual toggle",
+          "Fonts: IBM Plex Sans + IBM Plex Mono + Barlow Condensed (Google Fonts)",
+        ],
+      },
+      {
+        id: "delivery",
+        title: "Delivery — base64 Attachment via Power Automate",
+        type: "list",
+        description: "The Code node base64-encodes the final HTML and sends it to Power Automate as a JSON payload. Power Automate's Office 365 Outlook connector attaches the decoded file to an email.",
+        items: [
+          "File: <code>wazuh-weekly-report-YYYY-MM-DD.html</code>",
+          "Email subject: <code>Weekly SOC Report — wazuh-weekly-report-YYYY-MM-DD.html</code>",
+          "Email body: plain-text KPI summary (total, unique sources, blocked, critical, compromised accounts, new sources)",
+          "Attachment method: base64 string in POST body → Power Automate decodes and attaches via Outlook connector",
+          "No Azure blob storage, no SharePoint, no n8n binary file storage — the file lives only in the POST payload",
+        ],
+      },
+    ],
+
+    designDecisions: [
+      {
+        title: "HTML template embedded as base64 in the Code node",
+        body: `The dashboard HTML is a large string with backticks, template literals, and double quotes throughout. Embedding it directly inside a JavaScript string in the n8n Code node would require escaping hundreds of characters.
+
+Instead, the template is stored as a base64 string in a <code>const TEMPLATE_B64</code> at the top of the node, then decoded at runtime with <code>Buffer.from(TEMPLATE_B64, 'base64').toString('utf-8')</code>. This makes the template fully self-contained in the workflow JSON with zero escaping issues and easy to update by re-encoding.`,
+      },
+      {
+        title: "Data injected via a placeholder comment in the template",
+        body: `The HTML template contains the sentinel: <code>/*__ALERTS_JSON__*/[]/*__END_ALERTS_JSON__*/</code>. The Code node does a single string replace: <code>template.replace("/*__ALERTS_JSON__*/[]/*__END_ALERTS_JSON__*/", JSON.stringify(rawAlerts))</code>.
+
+This avoids any DOM manipulation at generation time. The template's own JavaScript reads the resulting literal array at load time, so the dashboard is completely static after injection.`,
+      },
+      {
+        title: "base64 attachment avoids blob storage and app registration",
+        body: `Sending an HTML file via email requires either a file server (SharePoint, Azure Blob, S3) or an app registration to call the Mail API directly. Both are non-trivial to set up and add infrastructure dependencies.
+
+The Power Automate Office 365 Outlook connector accepts a base64 file payload natively — no app registration, no storage account, no SAS tokens. The tradeoff is a larger HTTP payload (~1.3× the HTML file size), but for a weekly report under ~500 KB this is negligible.`,
+      },
+      {
+        title: "Coordinated attack detection uses 90-minute sliding window",
+        body: `The real-time alerting pipeline detects coordinated attacks using a 1-hour window via SQL (<code>created_at >= now() - interval '1 hour'</code> per agent). In the weekly report, the same detection runs client-side in JavaScript using a 90-minute window with a two-pointer sweep over sorted timestamps.
+
+The extended window catches slower coordinated scans that might spread events just outside a 60-minute window, and the client-side implementation avoids adding another SQL query to the weekly report job.`,
+      },
+    ],
+
+    nextSteps: [
+      "Add a trend section comparing this week vs last week for each KPI",
+      "Include a MITRE ATT&CK heatmap (matrix view) in the HTML dashboard",
+      "Store generated reports in a PostgreSQL table for historical access without re-running the query",
+      "Add a Teams message alongside the email with the top 3 findings inline",
+    ],
+  },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
