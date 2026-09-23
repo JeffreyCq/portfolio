@@ -104,6 +104,34 @@ nav {
   max-width: 520px;
 }
 
+/* ── Type filter (Automations / Software) ── */
+.type-filter {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.type-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.type-btn:hover { border-color: var(--ink3); color: var(--ink2); }
+.type-btn.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
 /* ── Filter chips ── */
 .filter-bar {
   display: flex;
@@ -319,10 +347,11 @@ nav {
 
   <header class="port-header">
     <div class="port-header-label">jeffreycedeno.com / portfolio</div>
-    <h1>Automation Portfolio</h1>
-    <p>CRM integrations, automation workflows, and software builds across GoHighLevel, n8n, AWS Lambda, and Power Automate.</p>
+    <h1>Portfolio</h1>
+    <p>Automation workflows, CRM integrations, and software builds — GoHighLevel, n8n, AWS Lambda, Power Automate, and more.</p>
   </header>
 
+  <div class="type-filter" id="type-filter" role="group" aria-label="Filter by type"></div>
   <div class="filter-bar" id="filter-bar" role="group" aria-label="Filter by category"></div>
 
   <div class="project-grid" id="project-grid"></div>
@@ -337,7 +366,20 @@ nav {
 <script src="data.js"></script>
 <script>
 (function () {
-  let activeFilter = 'all';
+  let activeType = 'all';     // 'all' | 'automation' | 'software'
+  let activeCategory = 'all'; // 'all' | category slug
+
+  function getProjectType(p) {
+    return getCategoryBySlug(p.category).type || 'software';
+  }
+
+  function visibleProjects() {
+    return getPublishedProjects().filter(p => {
+      const typeOk = activeType === 'all' || getProjectType(p) === activeType;
+      const catOk  = activeCategory === 'all' || p.category === activeCategory;
+      return typeOk && catOk;
+    });
+  }
 
   function statusClass(s) {
     if (!s) return '';
@@ -382,11 +424,9 @@ nav {
       </a>`;
   }
 
-  function renderGrid(filter) {
+  function renderGrid() {
     const grid = document.getElementById('project-grid');
-    const projects = getPublishedProjects().filter(p =>
-      filter === 'all' || p.category === filter
-    );
+    const projects = visibleProjects();
 
     if (projects.length === 0) {
       grid.innerHTML = '<div class="empty-state">No projects in this category yet.</div>';
@@ -395,39 +435,76 @@ nav {
     }
   }
 
-  function renderFilters() {
-    const bar = document.getElementById('filter-bar');
+  function renderTypeFilter() {
+    const bar = document.getElementById('type-filter');
     const published = getPublishedProjects();
+
+    const types = [
+      { key: 'all',        label: 'All' },
+      { key: 'automation', label: 'Automations' },
+      { key: 'software',   label: 'Software' },
+    ];
+
+    bar.innerHTML = types.map(t => {
+      const count = t.key === 'all'
+        ? published.length
+        : published.filter(p => getProjectType(p) === t.key).length;
+      return `<button class="type-btn${t.key === 'all' ? ' active' : ''}"
+                      data-type="${t.key}"
+                      aria-pressed="${t.key === 'all'}">${t.label} <span style="opacity:0.45;font-size:10px;">${count}</span></button>`;
+    }).join('');
+
+    bar.querySelectorAll('.type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeType = btn.dataset.type;
+        activeCategory = 'all';
+        bar.querySelectorAll('.type-btn').forEach(b => {
+          b.classList.toggle('active', b === btn);
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        renderCategoryFilter();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderCategoryFilter() {
+    const bar = document.getElementById('filter-bar');
+    const published = getPublishedProjects().filter(p =>
+      activeType === 'all' || getProjectType(p) === activeType
+    );
 
     const allCount = published.length;
     const chips = [{ slug: 'all', label: 'All', count: allCount }];
 
     CATEGORIES.forEach(cat => {
+      if (activeType !== 'all' && cat.type !== activeType) return;
       const count = published.filter(p => p.category === cat.slug).length;
       if (count > 0) chips.push({ slug: cat.slug, label: cat.label, count });
     });
 
     bar.innerHTML = chips.map(chip => `
-      <button class="chip${chip.slug === 'all' ? ' active' : ''}"
+      <button class="chip${chip.slug === activeCategory ? ' active' : ''}"
               data-filter="${chip.slug}"
               data-count="${chip.count}"
-              aria-pressed="${chip.slug === 'all'}">${chip.label}</button>
+              aria-pressed="${chip.slug === activeCategory}">${chip.label}</button>
     `).join('');
 
     bar.querySelectorAll('.chip').forEach(btn => {
       btn.addEventListener('click', () => {
-        activeFilter = btn.dataset.filter;
+        activeCategory = btn.dataset.filter;
         bar.querySelectorAll('.chip').forEach(b => {
           b.classList.toggle('active', b === btn);
           b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
         });
-        renderGrid(activeFilter);
+        renderGrid();
       });
     });
   }
 
-  renderFilters();
-  renderGrid('all');
+  renderTypeFilter();
+  renderCategoryFilter();
+  renderGrid();
 })();
 </script>
 </body>

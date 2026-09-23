@@ -5,6 +5,8 @@
 // No other files need to change.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// type: 'automation' groups workflow/integration projects
+//       'software'  groups built apps, tools, and libraries
 const CATEGORIES = [
   {
     slug: 'gohighlevel',
@@ -12,6 +14,7 @@ const CATEGORIES = [
     color: '#f97316',
     bg: 'rgba(249,115,22,0.08)',
     description: 'CRM pipelines, workflows, funnels and lead automation',
+    type: 'automation',
   },
   {
     slug: 'n8n',
@@ -19,6 +22,7 @@ const CATEGORIES = [
     color: '#e11d48',
     bg: 'rgba(225,29,72,0.07)',
     description: 'Self-hosted workflow automation and API integrations',
+    type: 'automation',
   },
   {
     slug: 'aws-lambda',
@@ -26,6 +30,7 @@ const CATEGORIES = [
     color: '#d97706',
     bg: 'rgba(217,119,6,0.08)',
     description: 'Serverless functions, event-driven processing',
+    type: 'automation',
   },
   {
     slug: 'power-automate',
@@ -33,6 +38,7 @@ const CATEGORIES = [
     color: '#0078d4',
     bg: 'rgba(0,120,212,0.07)',
     description: 'Microsoft 365 flows and business process automation',
+    type: 'automation',
   },
   {
     slug: 'web-app',
@@ -40,6 +46,7 @@ const CATEGORIES = [
     color: '#7c3aed',
     bg: 'rgba(124,58,237,0.07)',
     description: 'Full-stack web applications built with Next.js, React, and PostgreSQL',
+    type: 'software',
   },
   {
     slug: 'desktop',
@@ -47,6 +54,7 @@ const CATEGORIES = [
     color: '#0891b2',
     bg: 'rgba(8,145,178,0.07)',
     description: 'Native desktop applications for Windows and macOS',
+    type: 'software',
   },
   {
     slug: 'python',
@@ -54,6 +62,7 @@ const CATEGORIES = [
     color: '#2563eb',
     bg: 'rgba(37,99,235,0.07)',
     description: 'Python tools, libraries, and automation scripts',
+    type: 'software',
   },
   {
     slug: 'jira-forge',
@@ -61,6 +70,7 @@ const CATEGORIES = [
     color: '#0052CC',
     bg: 'rgba(0,82,204,0.07)',
     description: 'Jira and Confluence apps built on Atlassian Forge',
+    type: 'software',
   },
 ];
 
@@ -896,6 +906,148 @@ const PROJECTS = [
       "Package and publish to PyPI",
       "Add Wazuh Cloud transport backend",
       "Add unit tests for all transport handlers",
+    ],
+  },
+
+  // ── n8n: Wazuh Security Alerts Pipeline ──────────────────────────────────
+  {
+    title: "Wazuh Security Alerts Pipeline",
+    slug: "wazuh-security-alerts-n8n",
+    category: "n8n",
+    tags: ["wazuh", "siem", "active-response", "mitre-attck", "postgresql", "teams", "adaptive-cards", "alerting"],
+    summary: "n8n workflow that ingests Wazuh Active Response events, enriches them with MITRE ATT&CK metadata and 24-hour attack statistics from PostgreSQL, and routes 6 contextual alert types to Microsoft Teams as Adaptive Cards — with a SQL anti-spam lock to prevent duplicate alerts.",
+    role: "Design & build (solo)",
+    tools: ["n8n", "JavaScript", "PostgreSQL", "Microsoft Teams", "Power Automate", "Wazuh"],
+    status: "Completed",
+    published: true,
+    featured: false,
+    cover: null,
+    date: "Sep 2026",
+
+    overview: `A security alerting pipeline built on n8n that bridges Wazuh's Active Response system with Microsoft Teams.
+
+Every time Wazuh blocks an IP or fires a high-level rule, it calls this workflow's webhook. The workflow:
+1. Parses the nested Wazuh AR payload and extracts MITRE ATT&CK fields
+2. Inserts the event into a PostgreSQL log table
+3. Runs a 24-hour CTE analytics query to classify the threat severity
+4. Builds a context-rich Adaptive Card (6 alert types, AbuseIPDB link, MITRE details)
+5. Posts the card to Microsoft Teams via Power Automate
+
+The key engineering constraint: Wazuh can fire dozens of events per second during a brute-force attack. A naive webhook-per-event would flood Teams. The solution is a SQL anti-spam lock that guarantees at most one card per threshold crossing, regardless of how many events arrive simultaneously.`,
+
+    architectureMermaid: `flowchart TD
+    WZ["Wazuh Manager\\nActive Response"] -->|"POST /webhook/wazuh-ar"| WH["Webhook Trigger"]
+    WH --> JS1["Parse Payload\\n(JavaScript)\\nextract: rule · level · MITRE\\nIP · user · agent · command"]
+    JS1 --> PG1[("PostgreSQL\\nINSERT ar_alerts_log\\nreturns new row id")]
+    PG1 --> PG2["CTE Analytics\\n24h window per group_key\\n6 escalation conditions\\nanti-spam: last_id = this_id?"]
+    PG2 --> IF{"Row\\nreturned?"}
+    IF -->|"No — another event\\nfired first"| STOP(["Stop"])
+    IF -->|"Yes — this event\\nis the threshold trigger"| JS2["Build Smart Card\\n6 alert types\\nAdaptive Card JSON"]
+    JS2 --> HTTP["HTTP Request"]
+    HTTP --> PA["Power Automate\\nHTTP trigger"]
+    PA --> TEAMS["Teams Channel\\nAdaptive Card"]`,
+
+    components: [
+      {
+        id: "schema",
+        title: "PostgreSQL — ar_alerts_log",
+        type: "list",
+        description: "Every Wazuh AR event is written here. The table drives both the analytics query and the deduplication lock.",
+        items: [
+          "<code>id</code> — SERIAL PK, used for anti-spam lock",
+          "<code>created_at</code> — TIMESTAMPTZ, window anchor for CTE",
+          "<code>rule_id</code> — Wazuh rule identifier (e.g. 40112 = valid account after failures)",
+          "<code>rule_level</code> — Wazuh severity level (1-15)",
+          "<code>rule_description</code> — human-readable rule label",
+          "<code>agent</code> — Wazuh agent (hostname) that fired the rule",
+          "<code>source_ip</code> — attacker IP (null for user-only events)",
+          "<code>source_user</code> — attacker username (null for IP-only events)",
+          "<code>group_key</code> — normalized attacker identifier: IP or <code>user:username</code>",
+          "<code>command</code> — AR action: BLOCKED or UNBLOCKED",
+          "<code>mitre_id</code> — MITRE technique ID (e.g. T1110.001)",
+          "<code>mitre_tactic</code> — MITRE tactic name (e.g. Credential Access)",
+          "<code>mitre_technique</code> — MITRE technique name",
+          "<code>program</code> — source program (sshd, pam_unix, etc.)",
+          "<code>raw</code> — full original JSON payload as JSONB",
+        ],
+      },
+      {
+        id: "cte",
+        title: "CTE Analytics Query — 6 Escalation Conditions",
+        type: "list",
+        description: "A single SQL query with 4 CTEs aggregates 24 hours of activity for the current group_key and returns a row only when at least one escalation condition is met AND the anti-spam lock passes.",
+        items: [
+          "<strong>window_alerts</strong> — all events for this group_key in the past 24h",
+          "<strong>ip_stats</strong> — attack count, distinct agents targeted, max severity, MITRE technique count, and whether rule 40112 fired",
+          "<strong>agent_stats</strong> — distinct source IPs hitting any targeted agent in the past 1h (coordinated attack detection)",
+          "<strong>first_seen</strong> — whether this group_key has ever appeared before in the log",
+        ],
+      },
+      {
+        id: "alert-types",
+        title: "Alert Type Classifier (Priority Order)",
+        type: "list",
+        description: "The Build Smart Card node evaluates conditions in priority order — first match wins — and sets the card color, severity label, and description accordingly.",
+        items: [
+          "🚨 <strong>SEVERE — Account Compromise:</strong> <code>has_valid_account_hit = true</code> (rule 40112: successful login attempt detected after prior auth failures from same IP/user)",
+          "🔥 <strong>CRITICAL — High-Severity Single Event:</strong> <code>max_severity ≥ 12</code> (Wazuh level 12+ = active exploitation or root compromise)",
+          "🧩 <strong>WARNING — Multi-Stage Attack Pattern:</strong> <code>distinct_techniques ≥ 2</code> (attacker using multiple MITRE ATT&CK techniques — indicates progression, not just scanning)",
+          "🎯 <strong>WARNING — Coordinated Attack:</strong> <code>distinct_sources_1h ≥ 5</code> (five or more IPs targeting the same host within 1h — botnet or distributed scan)",
+          "🆕 <strong>INFO — New Attacker:</strong> <code>is_first_seen = true</code> (first time this group_key appears in the log — creates baseline visibility)",
+          "🔴/🟠 <strong>Milestone:</strong> <code>attack_count ≥ 15</code> → CRITICAL, <code>≥ 10</code> → WARNING, else ⚠️ threshold (fires every 5 hits via <code>attack_count % 5 = 0</code>)",
+        ],
+      },
+      {
+        id: "payload-parser",
+        title: "Payload Parser — Wazuh Active Response Envelope",
+        type: "list",
+        description: "Wazuh wraps AR events in a nested envelope. The parser navigates the full path and normalizes the data, including MITRE enrichment from nested arrays.",
+        items: [
+          "Root path: <code>body.ar_events[0].all_fields.data.parameters.alert</code>",
+          "MITRE ID: first entry in <code>rule.mitre.id[]</code>",
+          "MITRE tactic: first entry in <code>rule.mitre.tactic[]</code>",
+          "MITRE technique: first entry in <code>rule.mitre.technique[]</code>",
+          "source_ip: <code>data.srcip</code> (may be undefined for account-name-only rules)",
+          "source_user: <code>data.dstuser || data.srcuser</code>",
+          "group_key: <code>source_ip</code> if present, else <code>user:source_user</code> — used as the deduplication and aggregation key",
+        ],
+      },
+    ],
+
+    designDecisions: [
+      {
+        title: "SQL anti-spam lock prevents alert flooding",
+        body: `The query's HAVING clause includes: <code>AND last_inserted_id = $current_insert_id</code>.
+
+After every INSERT, the workflow queries the latest row id for this group_key. If another event arrived between the INSERT and the query (common during brute-force storms), <code>last_inserted_id</code> will differ from the id we just inserted, and the query returns empty — no card is sent.
+
+This makes n8n's sequential node execution act as a distributed lock: only the event that atomically claims the "latest row" for its group_key fires the Teams notification.`,
+      },
+      {
+        title: "group_key abstraction — IP or user:",
+        body: `Some Wazuh rules fire on username without a source IP (e.g. rule 40112 — Account Compromise — reports the target username, not the attacker IP). Without abstraction, these events would never aggregate.
+
+The group_key is set as:
+- <code>source_ip</code> if available
+- <code>user:${'{'}source_user{'}'}</code> otherwise (the <code>user:</code> prefix prevents collisions with actual IP strings)
+
+Every CTE join and anti-spam lock uses group_key, so user-based and IP-based events flow through identical logic.`,
+      },
+      {
+        title: "Alert priority — account compromise ranks above raw severity",
+        body: "Rule 40112 (successful login after brute-force failures) gets the highest severity tier even if the rule_level is moderate (e.g. 10). A successful compromise matters more than a loud-but-failed level-12 scan. The classifier checks conditions in explicit priority order, not by numeric level.",
+      },
+      {
+        title: "Relay via Power Automate instead of direct Teams webhook",
+        body: "Microsoft Teams' incoming webhook connector does not support Adaptive Card v1.4 (actionable buttons, badge elements). Power Automate does. The n8n workflow builds the full Adaptive Card JSON and POSTs it to a Power Automate HTTP trigger, which relays it to Teams using the connector that supports richer card syntax.",
+      },
+    ],
+
+    nextSteps: [
+      "Add a suppression list: skip alerts for known-safe IPs (pen-test ranges, monitoring systems)",
+      "Store sent-card metadata in a second table for incident tracking and replay",
+      "Add a Slack fallback channel for when Teams is unavailable",
+      "Migrate alert routing from Power Automate relay to direct Teams Graph API calls",
     ],
   },
 ];
