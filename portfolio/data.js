@@ -1190,6 +1190,139 @@ The extended window catches slower coordinated scans that might spread events ju
       "Add a Teams message alongside the email with the top 3 findings inline",
     ],
   },
+
+  // ── n8n: Grafana CRM Alert Notifications ──────────────────────────────────
+  {
+    title: "Grafana CRM Alert Notifications",
+    slug: "grafana-crm-alerts-n8n",
+    category: "n8n",
+    tags: ["grafana", "alertmanager", "crm", "postgresql", "teams", "adaptive-cards", "monitoring"],
+    summary: "n8n workflow that bridges Grafana Alertmanager to Microsoft Teams. Ingests Grafana webhook payloads, logs each CRM integration failure to PostgreSQL, and fires a Teams Adaptive Card when a contractor crosses error milestones (5 / 10 / 15 per day) — using the same SQL anti-spam lock to prevent duplicate alerts.",
+    role: "Design & build (solo)",
+    tools: ["n8n", "JavaScript", "PostgreSQL", "Grafana", "Microsoft Teams", "Power Automate"],
+    status: "Completed",
+    published: true,
+    featured: false,
+    cover: null,
+    date: "Sep 2026",
+
+    overview: `Grafana monitors CRM integration health across dozens of active campaigns. When an integration fails, Grafana fires an alertmanager webhook — but the raw alert payload is noisy: it includes datasource errors, infrastructure alerts, and repeated firings for the same event.
+
+This workflow filters the noise, logs every real CRM failure to PostgreSQL, and escalates only when a contractor crosses a daily error milestone (5, 10, or 15 errors). The same SQL anti-spam lock used in the Wazuh pipeline ensures that rapid parallel webhook firings never produce duplicate Teams cards.
+
+The result is a clean escalation path: on-call engineers see a Teams card that names the contractor, lists affected campaigns and integrations, and links directly to the campaign admin page, the Grafana panel, and a one-click silence URL.`,
+
+    architectureMermaid: `flowchart TD
+    GF["Grafana Alertmanager"] -->|"POST /webhook/grafana-crm-alerts"| WH["Webhook Trigger"]
+    WH --> JS1["Parse + Filter\\n(Code node)\\nKeep: status=firing, has context_campaign labels\\nSkip: DatasourceNoData\\nExtract: campaign · contractor · integration · status_code"]
+    JS1 --> PG1[("PostgreSQL\\nINSERT crm_alerts\\nreturns new row id")]
+    PG1 --> PG2["Milestone Query\\nCTE: count errors since last daily reset\\nMilestones: 5 · 10 · 15 per contractor\\nAnti-spam: last_inserted_id = this_id?"]
+    PG2 --> IF{"Milestone\\nhit?"}
+    IF -->|"No row returned"| STOP(["Stop"])
+    IF -->|"error_count present"| JS2["Build Smart Card\\n3 severity tiers\\nContractor · campaigns · integrations\\n3 action buttons"]
+    JS2 --> HTTP["HTTP Request"]
+    HTTP --> PA["Power Automate"]
+    PA --> TEAMS["Teams Adaptive Card\\n+ Grafana link + Silence URL"]`,
+
+    components: [
+      {
+        id: "schema",
+        title: "PostgreSQL — crm_alerts",
+        type: "list",
+        description: "Every firing CRM alert is persisted here. The table accumulates the full day's failures per contractor and is the source for milestone counting.",
+        items: [
+          "<code>id</code> — SERIAL PK, used for anti-spam lock",
+          "<code>received_at</code> — timestamp of when the alert arrived in n8n (mapped from Grafana's <code>startsAt</code>)",
+          "<code>campaign_id</code> — Grafana label <code>context_campaign_id</code>",
+          "<code>campaign_name</code> — Grafana label <code>context_campaign_name</code>",
+          "<code>contractor_id</code> — Grafana label <code>context_contractor_id</code>",
+          "<code>contractor_name</code> — Grafana label <code>context_contractor_name</code>",
+          "<code>integration</code> — integration name from Grafana label",
+          "<code>status_code</code> — HTTP status code returned by the integration",
+          "<code>starts_at</code> — original Grafana alert start time",
+          "<code>generator_url</code> — deep link to the specific Grafana panel that fired",
+          "<code>silence_url</code> — pre-filled Grafana silence URL for one-click suppression",
+          "<code>campaign_url</code> — direct link to the campaign in the CRM admin console",
+          "<code>reviewed</code> — BOOLEAN DEFAULT false, for manual triage workflow",
+        ],
+      },
+      {
+        id: "filter",
+        title: "Alert Filter — Context Label Guard",
+        type: "list",
+        description: "Grafana sends all alerts to the same webhook. The Code node filters down to only the alerts that represent real CRM failures.",
+        items: [
+          "Keep only alerts with <code>status === 'firing'</code> — ignores resolved/pending states",
+          "Skip any alert where <code>alertname</code> includes <code>'DatasourceNoData'</code> — these are Grafana datasource connection issues, not real CRM failures",
+          "Keep only alerts that have at least one label starting with <code>'context_campaign'</code> — guarantees the alert has campaign context and was fired by a CRM integration rule",
+          "Passes through each alert as its own n8n item for parallel downstream processing",
+        ],
+      },
+      {
+        id: "milestone-query",
+        title: "Milestone SQL Query — Daily Contractor Error Count",
+        type: "list",
+        description: "After each insert, a CTE query counts today's total errors for this contractor and returns a row only when a milestone (5, 10, or 15 errors) is hit exactly.",
+        items: [
+          "<strong>Window anchor:</strong> <code>received_at >= COALESCE((SELECT MAX(ran_at) FROM report_log WHERE report_type = 'daily'), CURRENT_DATE)</code> — resets on each daily report run",
+          "<strong>Per-contractor aggregation:</strong> <code>COUNT(*)</code> total errors, <code>COUNT(DISTINCT campaign_name)</code> affected campaigns, <code>STRING_AGG</code> for campaign list, integration list, status codes",
+          "<strong>Milestone filter:</strong> <code>WHERE error_count IN (5, 10, 15)</code> — exactly three escalation thresholds",
+          "<strong>Anti-spam lock:</strong> <code>AND last_inserted_id = {{ current insert id }}</code> — guarantees only the event that pushed the count to the threshold fires the card",
+          "Also returns <code>generator_url</code>, <code>silence_url</code>, <code>campaign_url</code> for card action buttons",
+        ],
+      },
+      {
+        id: "smart-card",
+        title: "Teams Adaptive Card — 3 Severity Tiers",
+        type: "list",
+        description: "The Smart Card node maps the milestone error count to a severity tier and builds a fully structured Adaptive Card with contractor context and actionable buttons.",
+        items: [
+          "🚨 <strong>SEVERE (≥ 15 errors):</strong> 'Escalate to Client Now' — red Attention theme, message: all integrations may be broken",
+          "🔴 <strong>CRITICAL (≥ 10 errors):</strong> 'Client Likely Broken' — red Attention theme, message: check all campaigns immediately",
+          "⚠️ <strong>WARNING (= 5 errors):</strong> 'Repeated Client Failures' — Warning theme, message: monitor, count is rising",
+          "Card header: emoji + severity title + error count (large) + subtitle",
+          "Info block: Contractor name · Campaigns affected count · Campaign list · Integrations involved · Status codes",
+          "Action button: 📋 View Last Campaign → direct link to CRM admin filtered to that campaign",
+          "Action button: 📊 View in Grafana → deep link to the Grafana panel that fired",
+          "Action button: 🔕 Silence Alert → pre-filled Grafana silence URL, one click to suppress",
+        ],
+      },
+    ],
+
+    designDecisions: [
+      {
+        title: "Milestone-only firing prevents alert fatigue",
+        body: `Grafana can fire the same alert repeatedly as it re-evaluates on its interval. Without a threshold, every individual CRM failure would generate a Teams card — unusable at scale.
+
+The query uses <code>WHERE error_count IN (5, 10, 15)</code> (exact match, not ≥) so cards fire only at three meaningful escalation points. Combined with the anti-spam lock, a contractor that reaches 5 errors generates exactly one WARNING card, one CRITICAL card at 10, and one SEVERE card at 15 — regardless of how many webhook calls arrive.`,
+      },
+      {
+        title: "Daily window reset via report_log",
+        body: `Error counts need to reset daily so contractors don't accumulate milestones across multiple days. The window anchor is: <code>received_at >= COALESCE((SELECT MAX(ran_at) FROM report_log WHERE report_type = 'daily'), CURRENT_DATE)</code>.
+
+When the daily report job runs, it writes a row to <code>report_log</code>. The next Grafana alert after that timestamp starts a fresh count. This couples the alert window to the reporting cycle — both systems see the same day boundary without a separate cron or reset job.`,
+      },
+      {
+        title: "Anti-spam lock — same pattern as Wazuh real-time pipeline",
+        body: `Grafana alertmanager can replay alerts if n8n returns a non-2xx response, and multiple firing alerts can arrive in rapid succession. Without a lock, two parallel executions could both read <code>error_count = 5</code> and each send a card.
+
+The lock: <code>AND last_inserted_id = {{ $('Insert rows in a table').item.json.id }}</code> compares the row id the current execution just inserted against the maximum id for this contractor. If another execution inserted a row between this INSERT and this SELECT, the ids differ and the query returns empty. Only the execution that atomically claims "latest row" sends the card.`,
+      },
+      {
+        title: "context_campaign label convention — Grafana alert labeling standard",
+        body: `Grafana routes all alerts to the same webhook contact point. The filter requires at least one label key starting with <code>context_campaign</code> to distinguish CRM integration alerts from infrastructure alerts (node down, datasource errors, etc.) that share the same contact point.
+
+This convention was established in the Grafana alert rules: every rule that monitors a CRM integration adds <code>context_campaign_id</code> and <code>context_campaign_name</code> labels from the query's data. Infrastructure rules don't, so they pass through n8n without touching PostgreSQL.`,
+      },
+    ],
+
+    nextSteps: [
+      "Add a <code>reviewed</code> flag update endpoint so triage actions from Teams can mark alerts as reviewed",
+      "Implement a fourth milestone (≥ 20 errors) that pages the on-call engineer via SMS/PagerDuty",
+      "Build a daily summary card from the same <code>crm_alerts</code> table, analogous to the Wazuh weekly report",
+      "Add deduplication at the INSERT level to prevent the same Grafana alert from logging twice on retries",
+    ],
+  },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
