@@ -345,7 +345,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/homebuddy-integrations-bot/cover.png",
     date: "Aug 2026",
 
     overview: `Internal AI assistant built for HomeBuddy's Partnership Managers. PMs ask natural-language questions — integration setup steps, lead-field placeholders, troubleshooting — and the bot retrieves the most relevant chunks from a Confluence-derived knowledge base stored in S3, runs them through Amazon Nova Pro via Bedrock, and posts a concise reply back in the Teams thread. Deployed as an AWS Lambda function behind a Teams Outgoing Webhook.`,
