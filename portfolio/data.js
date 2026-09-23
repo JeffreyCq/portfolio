@@ -678,13 +678,13 @@ const PROJECTS = [
 
   // ── Jira Forge — Quinstreet Dashboard ───────────────────────────────────────
   {
-    title: "Operational Metrics Dashboard — Jira Forge App",
+    title: "Operational Dashboard — Jira Forge App",
     slug: "quinstreet-jira-dashboard",
     category: "jira-forge",
-    tags: ["atlassian-forge", "jira", "kpi", "charts", "sla", "typescript", "async-queue"],
-    summary: "Atlassian Forge app that surfaces live operational KPIs for internal security and support Jira projects: SLA breach rate, time-in-progress, reopen rate, and backlog aging — with rule-based action suggestions and configurable thresholds.",
+    tags: ["atlassian-forge", "jira", "kpi", "charts", "sla", "typescript", "async-queue", "forge-kvs", "forge-events", "semgrep", "jest"],
+    summary: "Production Jira Cloud app I designed and built end-to-end for an internal IT/Security service desk. Live operational KPIs — SLA compliance, backlog aging, team workload, escalations — rendered natively inside Jira with a rule-based focus-area engine, configurable thresholds, and a background async compute path that works around Forge's 25-second function limit.",
     role: "Design & build (solo)",
-    tools: ["Atlassian Forge", "TypeScript", "React", "Forge KV Store", "Forge Events", "Jira REST API", "Jest"],
+    tools: ["Atlassian Forge", "TypeScript", "@forge/resolver", "@forge/kvs", "@forge/events", "Jira REST API", "Jest / ts-jest", "ESLint", "Semgrep"],
     status: "Completed",
     published: true,
     featured: false,
@@ -693,33 +693,34 @@ const PROJECTS = [
 
     note: "Built for internal use at HomeBuddy (Quinstreet). Deployed to Atlassian Forge infrastructure.",
 
-    overview: `Jira project page app built on Atlassian Forge for the INFOSEC, CT, and ATLAS internal teams. Pulls live Jira issue data, computes operational KPIs, and renders them as stat cards and charts. A rule-based "Insights" engine derives ranked, severity-tagged action suggestions from the same RAG thresholds used by the stat cards — deterministic, no AI dependency. A background async job handles heavy metric computation so the UI stays responsive.`,
+    overview: `Native Jira Cloud app built on Atlassian Forge (UI Kit) for the internal INFOSEC, CT, and ATLAS service-desk teams. Replaces ad-hoc JQL searches and manual reporting with a live operations dashboard rendered directly in Jira's own navigation — no export, no separate BI tool. Fully configurable per project (field mappings, SLA thresholds, status names, aging buckets) without a redeploy. A rule-based "suggested focus areas" panel flags out-of-range metrics without calling an LLM.`,
 
     components: [
       {
-        id: "kpis",
-        title: "KPIs & Charts",
+        id: "metrics",
+        title: "Metrics & Filters",
         type: "table",
-        headers: ["Metric", "Visualization"],
+        headers: ["Metric / Feature", "Detail"],
         rows: [
-          ["SLA breach rate", "RAG stat card + donut chart"],
-          ["Average time-in-progress", "RAG stat card + line trend"],
-          ["SLA compliance %", "RAG stat card"],
-          ["Reopen rate", "RAG stat card"],
+          ["SLA compliance & breach rate", "RAG stat card + donut chart; threshold configurable per project"],
+          ["First-response & resolution time", "Reads native SLA field when configured; falls back to first-comment timestamp"],
+          ["Reopen rate", "RAG stat card; flags rework patterns"],
           ["Ticket volume by priority", "Horizontal bar chart"],
-          ["Backlog aging buckets", "Stacked bar chart"],
-          ["Status flow", "Stacked bar chart"],
+          ["Backlog aging buckets", "Stacked bar chart; bucket ranges admin-configurable"],
+          ["Team workload", "Assignee-level breakdown"],
+          ["Date-range presets", "3 / 7 / 15 / 30 / 90 days, custom range"],
+          ["Multi-select filters", "Priority, request type, assignee, status; 'hide internal agents' toggle"],
         ],
       },
       {
         id: "insights",
-        title: "Insights Engine",
+        title: "Rule-Based Insights Engine",
         type: "list",
         items: [
-          "Rule-based engine derives ranked, severity-tagged action suggestions from RAG thresholds",
-          "Deterministic — no AI dependency; suggestions update as metrics change",
-          "Configurable thresholds and agent exclusions via project settings page",
-          "Project allowlist enforced both client-side and server-side (resolver guard)",
+          "Ranks and severity-tags metrics that fall outside the configured healthy range",
+          "Fully deterministic — no LLM, no external API; suggestions update as metrics change",
+          "Thresholds, field mappings, and labels are admin-configurable per project",
+          "Same RAG thresholds used by both stat cards and the insights panel — single source of truth",
         ],
       },
       {
@@ -727,12 +728,35 @@ const PROJECTS = [
         title: "Infrastructure",
         type: "list",
         items: [
-          "Background async compute job (15-minute timeout) via Forge Events queue",
-          "KV-cached results with cache staleness detection",
-          "Error boundary + global error handler wiring in the frontend",
-          "Jest + Testing Library unit and component tests",
-          "Semgrep security scanning in CI",
+          "Bounded synchronous path for initial load; <code>@forge/events</code> async queue (900-second budget) for full-depth refreshes",
+          "KVS-backed cache keyed per project <em>and</em> per filter combination — changing filters is a cache read",
+          "Trend series (week / month / quarter) pre-bucketed at compute time; chart granularity changes need no recompute",
+          "Metrics computed with app identity (not viewer identity) for consistent numbers across permission levels",
+          "TypeScript strict mode, Jest test suite with Forge harness + realistic API fixtures, ESLint, Semgrep SAST",
         ],
+      },
+    ],
+
+    designDecisions: [
+      {
+        title: "Worked around Forge's 25-second hard limit with a split compute path",
+        body: "User-invoked Forge functions cannot exceed 25 seconds — no exceptions, no config flag. I split the compute path: a bounded synchronous load for the initial render, and a <code>@forge/events</code> async consumer (900-second budget) for full-depth refreshes, coordinated through a KVS cache. No workaround hacks — a real architectural split.",
+      },
+      {
+        title: "Cut third-party API calls by ~90% without losing accuracy",
+        body: "The naive implementation issued two extra REST calls per ticket (changelog + comments). Fixed by: requesting changelog inline via the search endpoint's <code>expand</code> parameter; reading first-response time from a native SLA field with a fallback; replacing a paged count call with a single approximate-count endpoint; and pre-bucketing all trend series at compute time so granularity changes are cache reads.",
+      },
+      {
+        title: "Found and fixed a silent timezone bug in generated JQL",
+        body: "Absolute UTC datetime literals in JQL are evaluated against the Jira site's <em>own</em> configured timezone, not UTC — invisible on a 90-day window but large enough to silently include/exclude tickets on a 3-day window. Fixed by switching rolling presets to JQL's native relative-date literals (<code>created >= -3d</code>) and custom ranges to plain calendar dates with exclusive end boundaries.",
+      },
+      {
+        title: "Designed for cost, not just correctness",
+        body: "After shipping, I profiled real Jira API usage: removed a scheduled background trigger recomputing every project every 5 minutes regardless of traffic; excluded the single highest-volume project (the dominant cost driver) rather than over-engineering for its outlier scale; replaced a 'load everything in batches' design with a single bounded fetch plus a 'showing partial data' state — simpler and objectively cheaper.",
+      },
+      {
+        title: "App identity for metric consistency across permission levels",
+        body: "Metrics are computed with the app's own Jira identity rather than the viewer's. User-identity calls were silently returning zero/partial results for viewers without direct issue-level access — a bug invisible in testing that only surfaced with live users. Switching to app identity made every viewer see the same numbers.",
       },
     ],
 
