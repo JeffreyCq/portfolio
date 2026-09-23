@@ -87,7 +87,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: true,
-    cover: "img/ghl-contractor-lead-system/cover.png", // workflows list view
+    cover: "img/ghl-contractor-lead-system/cover.png?v=2",
     date: "Sep 2026",
 
     note: "Portfolio/demo sub-account with fictional business data.",
@@ -678,7 +678,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: "img/quinstreet-jira-dashboard/cover.png",
+    cover: "img/quinstreet-jira-dashboard/cover.png?v=2",
     date: "Sep 2026",
 
     note: "Built for internal use at HomeBuddy (Quinstreet). Deployed to Atlassian Forge infrastructure.",
@@ -769,7 +769,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: "img/jam-json-modifier/cover.png",
+    cover: "img/jam-json-modifier/cover.png?v=2",
     date: "Sep 2026",
 
     overview: `JAM started as a small internal formatter and grew into a complete JSON workbench. It replaces the browser-tab JSON viewers and the copy-paste cycle with a dedicated native app: open files, inspect their tree, transform and validate them, and compare two versions side by side — all without leaving the editor. Ships as an NSIS installer and portable <code>.exe</code> for Windows, and a universal DMG (Intel + Apple Silicon) for macOS.`,
