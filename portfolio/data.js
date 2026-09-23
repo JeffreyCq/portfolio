@@ -1442,7 +1442,7 @@ For an IT Support Q&A bot, a 60-second response time is acceptable and often fas
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/contractor-benefits-enrichment-pa/cover.png",
     date: "May 2026",
 
     overview: `A lightweight webhook that bridges two systems with no custom code: an Excel spreadsheet maintained by the sales/ops team, and Ricochet's lead management API.
