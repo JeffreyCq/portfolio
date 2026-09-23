@@ -1437,6 +1437,109 @@ For an IT Support Q&A bot, a 60-second response time is acceptable and often fas
       "Add a KB admin command: a special message prefix that lets IT staff add a new KB entry directly from Teams",
     ],
   },
+
+  // ── Power Automate: Contractor Benefits Lead Enrichment ───────────────────
+  {
+    title: "Contractor Benefits Lead Enrichment",
+    slug: "contractor-benefits-enrichment-pa",
+    category: "power-automate",
+    tags: ["lead-enrichment", "excel", "ricochet", "api", "webhook", "data-sync", "homeservices"],
+    summary: "Two-step Power Automate flow that acts as a webhook microservice: receives a lead ID and company name, looks up that contractor's benefits from an Excel table in SharePoint, and writes all 10 benefit fields to the lead record via the Ricochet API in a single PUT — no code, no database.",
+    role: "Design & build",
+    tools: ["Power Automate", "Excel Online", "SharePoint", "Ricochet API"],
+    status: "Completed",
+    published: true,
+    featured: false,
+    cover: null,
+    date: "May 2026",
+
+    overview: `A lightweight webhook that bridges two systems with no custom code: an Excel spreadsheet maintained by the sales/ops team, and Ricochet's lead management API.
+
+When a lead is matched to a contractor in Ricochet, the upstream system calls this flow with the lead ID and company name. The flow looks up the contractor's row in the Excel benefits table and immediately pushes all 10 benefit fields (financing options, warranty, promotions, insurance acceptance, senior/veteran discounts, quote validity, etc.) to the lead record.
+
+The result: every Ricochet lead automatically carries the contractor's full benefits profile without anyone manually copying data between the spreadsheet and the CRM. The ops team keeps the spreadsheet; the flow keeps the leads in sync.`,
+
+    architectureMermaid: `flowchart TD
+    CALLER["Upstream System\\n(lead matching service)"] -->|"POST {Leadid, Company}"| HTTP_IN["HTTP Trigger\\n(webhook)"]
+    HTTP_IN --> XL["Excel Online\\nList rows from SharePoint table\\nFilter: Company_Name = Company\\nreturns matching contractor row"]
+    XL --> API["HTTP PUT\\nRicochet API\\n/leads/{Leadid}\\n10 benefit fields from first() row"]
+    API --> RICO["Ricochet Lead Record\\nenriched with contractor benefits"]`,
+
+    components: [
+      {
+        id: "trigger",
+        title: "HTTP Trigger — Webhook Interface",
+        type: "list",
+        description: "The flow exposes a standard Power Automate HTTP trigger, turning it into a callable webhook that any upstream service can invoke without Power Automate credentials.",
+        items: [
+          "Method: POST, auth: All (URL-authenticated via the auto-generated SAS token in the trigger URL)",
+          "Input schema: <code>{ Leadid: string, Company: string }</code>",
+          "<code>Leadid</code> — the Ricochet lead record to update",
+          "<code>Company</code> — the contractor company name, used as the lookup key in the Excel table",
+        ],
+      },
+      {
+        id: "excel-lookup",
+        title: "Excel Online — Contractor Benefits Table",
+        type: "list",
+        description: "The Excel table in SharePoint is the single source of truth for contractor benefits. The flow queries it with an OData filter to return only the matching company row.",
+        items: [
+          "Source: Excel Online (Business) — file hosted in a SharePoint group drive",
+          "Filter: <code>Company_Name eq '{Company}'</code> — OData filter applied server-side",
+          "Lookup: <code>first(body('Enumerar_las_filas_de_una_tabla')['value'])</code> — takes the first matching row",
+          "10 columns mapped: Phone Number, Offers Financing?, Offer Promotions?, Offer Warranty?, Accept Insurance Claims?, Offer Other Products or Services?, Offer Senior Discount?, Offer Military Discount?, How Long is quote good for?, Additionals Comments",
+        ],
+      },
+      {
+        id: "ricochet-put",
+        title: "Ricochet API — Lead Enrichment PUT",
+        type: "list",
+        description: "A single HTTP PUT call updates all 10 benefit fields on the lead record simultaneously.",
+        items: [
+          "Endpoint: <code>PUT https://ricochet.me/api/v4/leads/{Leadid}</code>",
+          "Auth: <code>X-AUTH-TOKEN</code> header (API key, value masked)",
+          "<code>company_contact_number</code> ← Excel 'Phone Number'",
+          "<code>financing_options</code> ← Excel 'Offers Financing?'",
+          "<code>runs_promotions_offers</code> ← Excel 'Offer Promotions?'",
+          "<code>offer_warranty</code> ← Excel 'Offer Warranty?'",
+          "<code>accepts_insurance_claims</code> ← Excel 'Accept Insurance Claims?'",
+          "<code>offer_other_products</code> ← Excel 'Offer Other Products or Services?'",
+          "<code>offers_senior_discounts</code> ← Excel 'Offer Senior Discount?'",
+          "<code>offers_veteran_discounts</code> ← Excel 'Offer Military Discount?'",
+          "<code>how_long_quote_is_good_for</code> ← Excel 'How Long is quote good for?'",
+          "<code>Additional_Comments</code> ← Excel 'Additionals Comments'",
+        ],
+      },
+    ],
+
+    designDecisions: [
+      {
+        title: "Excel as the benefits data store — ops-owned, no IT dependency",
+        body: `Contractor benefits change frequently: a contractor adds financing, drops a discount, updates their quote validity window. If this data lived in a database, every change would require a developer or an admin panel.
+
+By keeping the benefits in an Excel table on SharePoint, the sales/ops team can update it directly. The flow always reads the latest version — no cache to invalidate, no migration to run. The only rule: the Company_Name column must exactly match what the upstream system sends as the Company parameter.`,
+      },
+      {
+        title: "HTTP trigger turns Power Automate into a microservice",
+        body: `Instead of building a dedicated API server or Lambda function for a simple lookup-and-write operation, the HTTP trigger endpoint on Power Automate handles the request. The trigger URL contains a SAS token that authenticates callers without requiring them to have Microsoft 365 credentials.
+
+Any system that can make an HTTP POST can call this flow — the lead matching service, a CRM webhook, or a manual trigger from Postman during testing. This makes the flow independently testable and decoupled from the caller's tech stack.`,
+      },
+      {
+        title: "Single PUT for all 10 fields — atomic update",
+        body: `All 10 benefit fields are sent in one HTTP PUT body rather than 10 separate PATCH calls. This means Ricochet either receives the full contractor benefits profile or nothing — there's no partial state where some fields are updated and others aren't.
+
+The tradeoff is that if the Excel row is missing a field, Ricochet receives an empty string for that field rather than leaving the existing value untouched. For this use case, the Excel table is maintained to always have complete rows, so partial updates weren't a concern.`,
+      },
+    ],
+
+    nextSteps: [
+      "Add error handling: if no Excel row matches the company name, return a 404-style response body instead of sending empty fields to Ricochet",
+      "Add a response action to return the Ricochet API response status back to the caller",
+      "Replace the Excel lookup with a SharePoint List for better filtering, versioning, and multi-user editing support",
+      "Log each enrichment call to an audit table (company, leadId, timestamp) for troubleshooting data mismatches",
+    ],
+  },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
