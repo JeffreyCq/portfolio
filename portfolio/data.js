@@ -913,7 +913,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/wazuh-security-alerts-n8n/cover.png",
     date: "Sep 2026",
 
     overview: `A security alerting pipeline built on n8n that bridges Wazuh's Active Response system with Microsoft Teams.
