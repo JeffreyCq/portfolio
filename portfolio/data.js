@@ -804,7 +804,7 @@ const PROJECTS = [
     role: "Design & build (solo)",
     tools: ["C#", ".NET 8", "WPF", "Entity Framework Core", "SQLite", "Material Design XAML", "CommunityToolkit.MVVM", "QuestPDF"],
     status: "Completed",
-    published: true,
+    published: false,
     featured: false,
     cover: null,
     date: "Apr 2026",
