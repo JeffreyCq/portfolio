@@ -1032,6 +1032,90 @@ const PROJECTS = [
     ],
   },
 
+  // ── Python — Confluence KB Sync Tool ─────────────────────────────────────
+  {
+    title: "Confluence KB Sync Tool",
+    slug: "confluence-kb-tool",
+    category: "python",
+    tags: ["python", "cli", "jinja2", "confluence", "yaml", "click", "keyring", "knowledge-base", "ai-assisted", "pip"],
+    summary: "pip-installable Python CLI that syncs local files to Confluence — Jinja2 templates for page layout, YAML for content, OS keyring for credentials. Built by generalizing a single-company KB pipeline (118 production Confluence pages) into a fully reusable, zero-domain-logic engine any team can adopt.",
+    role: "Sole engineer — architecture, implementation, verification, content authoring",
+    tools: ["Python", "Click", "Jinja2", "PyYAML", "Confluence REST API", "OS keyring"],
+    status: "Completed",
+    published: true,
+    featured: false,
+    cover: null,
+    date: "Sep 2026",
+    repoUrl: "https://github.com/JeffreyCq/confluence-kb-tool",
+
+    overview: `Started as a refactor of a single-company pipeline that synced 118 CRM integration pages to Confluence. Every piece of page copy was hardcoded in Python and all field names were company-specific — meaning non-engineers couldn't update the KB and nothing could be reused elsewhere. I extracted content into an editable <code>content.yaml</code>, ported layout to Jinja2 templates, and then generalized the whole engine into <code>confluence-kb-tool</code>: a pip-installable, Click-based CLI (<code>kb-tool init / preview / push / index / auth</code>) with zero domain-specific logic in the installable package. The original company's setup became the reference implementation.`,
+
+    components: [
+      {
+        id: "engine",
+        title: "Sync Engine",
+        type: "list",
+        items: [
+          "Find / create / update Confluence pages by title; resumable batching; dry-run mode",
+          "\"Preserve everything after a marker\" semantics — hand-written notes below a divider are never overwritten",
+          "Configurable field names via <code>kb-tool.yaml</code> — zero domain logic in the installable package",
+          "<code>kb-tool init</code> scaffolds a new project: <code>kb-tool.yaml</code>, <code>content.yaml</code>, and a starter Jinja2 template",
+        ],
+      },
+      {
+        id: "rendering",
+        title: "Jinja2 Rendering",
+        type: "list",
+        items: [
+          "Page layout defined in an editable <code>.j2</code> template — structure is configurable per project, not just the words",
+          "Project-supplied <code>helpers.py</code> exposes custom logic (regex classification, formatting) without the core engine importing it",
+          "Content text lives in <code>content.yaml</code>: warnings, credential guides, troubleshooting bullets, per-integration notes — all editable by non-engineers",
+        ],
+      },
+      {
+        id: "auth",
+        title: "Credential & Config Handling",
+        type: "list",
+        items: [
+          "Credentials stored in OS keyring (Windows Credential Manager / macOS Keychain / Secret Service) via <code>kb-tool auth set</code>",
+          "Environment-variable override still supported for scripting and CI",
+          "All project configuration in a single <code>kb-tool.yaml</code> — one file to onboard a new team",
+        ],
+      },
+      {
+        id: "content",
+        title: "AI-Assisted Content (\"How to get credentials\")",
+        type: "list",
+        items: [
+          "Extended the KB with a per-integration \"How to get these values\" section across 118 third-party CRM systems",
+          "Parallel research agents against public vendor documentation; instructions only written where a verifiable source exists, cited inline",
+          "For the ~40% of niche vendors with no public docs: shipped an honest generic fallback and logged the gap to a tracked follow-up list — never fabricated steps",
+        ],
+      },
+    ],
+
+    designDecisions: [
+      {
+        title: "Byte-for-byte verification for every refactor step",
+        body: "The KB was live in production and could not regress. Every change — content extraction, Jinja port, CLI rewrite — was verified by rendering old and new code paths for all 118 real records and diffing character-for-character. Any difference was treated as a bug until proven intentional. This caught a real bug: YAML line-folding and Jinja whitespace trimming each silently inject stray characters at block boundaries — invisible when eyeballed, but caught immediately by a diff against a known-good baseline.",
+      },
+      {
+        title: "helpers.py pattern for custom logic without coupling",
+        body: "Templates often need project-specific formatting functions (regex classification, field transforms). Rather than embedding them in the core engine or requiring a fork, the CLI imports a project-supplied <code>helpers.py</code> at runtime — the core never depends on it directly. Custom logic stays in the project, not the package.",
+      },
+      {
+        title: "Honest fallback instead of fabricated AI output",
+        body: "The risk with AI-assisted content for a KB used by non-technical PMs giving instructions to clients: plausible-sounding but wrong steps cause real downstream errors. For vendors with no public documentation, I shipped a generic fallback and tracked the gap for manual research — trading completeness for trustworthiness.",
+      },
+    ],
+
+    nextSteps: [
+      "Publish to PyPI",
+      "Add support for bulk attachment uploads alongside page content",
+      "Add a diff preview command to show what would change before pushing",
+    ],
+  },
+
   // ── n8n: Wazuh Security Alerts Pipeline ──────────────────────────────────
   {
     title: "Wazuh Security Alerts Pipeline",

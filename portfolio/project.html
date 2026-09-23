@@ -867,6 +867,7 @@ code {
           ${p.role ? `<div class="proj-detail-item"><div class="proj-detail-label">Role</div><div class="proj-detail-value">${p.role}</div></div>` : ''}
           ${p.date ? `<div class="proj-detail-item"><div class="proj-detail-label">Date</div><div class="proj-detail-value">${p.date}</div></div>` : ''}
           ${p.tools && p.tools.length ? `<div class="proj-detail-item" style="grid-column:1/-1"><div class="proj-detail-label">Tools</div><div class="tools-row">${p.tools.map(t => `<span class="tool-pill">${t}</span>`).join('')}</div></div>` : ''}
+          ${p.repoUrl ? `<div class="proj-detail-item"><div class="proj-detail-label">Code</div><div class="proj-detail-value"><a href="${p.repoUrl}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-family:var(--mono);font-size:13px;">↗ ${p.repoUrl.replace(/^https?:\/\//, '')}</a></div></div>` : ''}
         </div>
       </div>`;
 
