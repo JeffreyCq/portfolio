@@ -1323,6 +1323,120 @@ This convention was established in the Grafana alert rules: every rule that moni
       "Add deduplication at the INSERT level to prevent the same Grafana alert from logging twice on retries",
     ],
   },
+
+  // ── Power Automate: IT Support KB Bot ────────────────────────────────────
+  {
+    title: "IT Support KB Answer Bot",
+    slug: "it-support-kb-power-automate",
+    category: "power-automate",
+    tags: ["ai-builder", "sharepoint", "teams", "knowledge-base", "it-support", "nlp"],
+    summary: "Power Automate flow that monitors a Microsoft Teams IT Support channel and auto-answers incoming questions using AI Builder. Loads the full knowledge base from a SharePoint list on every run, sends the KB + the user's question to an AI Builder custom prompt, and replies in-thread — or gracefully escalates to the IT team when confidence is insufficient.",
+    role: "Design & build",
+    tools: ["Power Automate", "AI Builder", "Microsoft Teams", "SharePoint", "Microsoft 365"],
+    status: "Completed",
+    published: true,
+    featured: false,
+    cover: null,
+    date: "Jun 2026",
+
+    overview: `An AI-powered Q&A bot for internal IT Support, built entirely within the Microsoft 365 ecosystem — no external APIs, no Azure OpenAI subscription, no custom backend.
+
+The flow monitors a Teams channel by polling every minute for new messages. When a question arrives, it pulls up to 100 entries from a SharePoint knowledge base list (each entry has a title, question, answer, keywords, and status), formats them as a single text block, and passes both the KB and the user's question to an AI Builder custom prompt that returns a structured JSON response.
+
+If the AI finds a match with sufficient confidence, the bot replies in the thread with the answer. If not, it replies with a standard escalation message tagging the IT team — so no question is silently dropped.
+
+The knowledge base lives in SharePoint, making it editable by non-technical IT staff without touching the flow. Adding a new Q&A pair is as simple as adding a row to the list.`,
+
+    architectureMermaid: `flowchart TD
+    POLL["Teams Trigger\\nPoll every 1 minute\\nIT Support channel"] -->|"new message batch"| EACH["Apply to Each"]
+    EACH --> EXTRACT["Compose\\nextract message body text"]
+    EXTRACT --> SP["SharePoint — Get Items\\nIT Support KB list\\ntop 100 entries"]
+    SP --> SEL["Select\\nmap fields:\\nTitle · Question · Answer\\nKeywords · Status"]
+    SEL --> JOIN["Compose\\njoin all KB entries\\nas newline-separated text block"]
+    JOIN --> AI["AI Builder\\nCustom Prompt\\nInputs: KBItems + UserQuestion\\nOutput: JSON schema"]
+    AI --> PARSE["Parse JSON\\nanswerFound · confidence\\nanswer · source"]
+    PARSE --> COND{"answer_found?"}
+    COND -->|"true"| YES["Reply in thread\\nAI-generated answer\\n(Flow Bot)"]
+    COND -->|"false"| NO["Reply in thread\\n'No confirmed answer found'\\nTag IT Support team"]`,
+
+    components: [
+      {
+        id: "kb-schema",
+        title: "SharePoint Knowledge Base — List Schema",
+        type: "list",
+        description: "The knowledge base is a standard SharePoint list, editable directly by IT staff. The flow maps internal SharePoint field names to readable keys before passing to AI Builder.",
+        items: [
+          "<code>Title</code> — entry name / topic label",
+          "<code>field_1</code> (Question) — the canonical form of the question",
+          "<code>field_2</code> (Answer) — the approved answer text",
+          "<code>field_3</code> (Keywords) — comma-separated keywords for AI matching",
+          "<code>field_5</code> (Status) — Active / Draft / Deprecated; lets IT staff retire entries without deleting them",
+          "Up to 100 entries loaded per run via <code>$top=100</code> on the SharePoint connector",
+        ],
+      },
+      {
+        id: "ai-prompt",
+        title: "AI Builder Custom Prompt — Structured Output",
+        type: "list",
+        description: "The prompt receives the full KB as a text block and the user's Teams message, and is instructed to return a fixed JSON schema so Power Automate can parse it deterministically.",
+        items: [
+          "Input: <code>KBItems</code> — all KB entries joined with double newlines",
+          "Input: <code>UserQuestion</code> — raw Teams message body (HTML stripped by Compose step)",
+          "Output schema: <code>{ answer_found: boolean, confidence: float 0–1, answer: string, source: string }</code>",
+          "<code>answer_found: false</code> instructs the flow to escalate instead of guessing — prevents hallucinated answers reaching users",
+          "<code>source</code> field tracks which KB entry was matched, for future logging",
+          "Runs on AI Builder standard tier — no Azure OpenAI subscription or custom deployment needed",
+        ],
+      },
+      {
+        id: "reply-logic",
+        title: "Reply Logic — Thread-Aware Responses",
+        type: "list",
+        description: "Both reply actions use the Teams connector's 'Reply to conversation' operation, targeting the original message's ID so the response appears as a thread reply.",
+        items: [
+          "Reply target: <code>parentMessageId = items('Apply_to_each')['id']</code> — anchors to the original question",
+          "Poster: Flow Bot identity (no personal account impersonation)",
+          "Success reply: AI-generated answer wrapped in paragraph HTML",
+          "Fallback reply: <code>'I couldn't find a confirmed answer in the current IT Support KB. IT Support team, please review this question.'</code>",
+          "Both branches post to the same group + channel, maintaining full thread context",
+        ],
+      },
+    ],
+
+    designDecisions: [
+      {
+        title: "SharePoint list as knowledge base — zero-code updates for IT staff",
+        body: `Using a SharePoint list instead of a database or JSON file means IT staff can update the KB directly in the SharePoint web UI without touching Power Automate. Adding a new Q&A pair, retiring an outdated entry, or flagging a draft are all list operations.
+
+The flow's Select step maps the internal <code>field_1/2/3/5</code> column names to readable keys (<code>Question</code>, <code>Answer</code>, <code>Keywords</code>, <code>Status</code>) so the prompt sees clean labels regardless of how SharePoint names the columns internally.`,
+      },
+      {
+        title: "Full KB reload on every run — simplicity over caching",
+        body: `The flow fetches all 100 KB items fresh on every trigger run rather than caching them in a variable or storage. This means every answer is always based on the current KB state — no stale cache to invalidate, no sync job to maintain.
+
+The tradeoff is a SharePoint API call per message. At IT Support volume (low single-digit messages per minute peak), this is negligible. If the KB grew past 100 entries or volume spiked, pagination or a caching layer would become necessary.`,
+      },
+      {
+        title: "Structured JSON output schema prevents prompt brittleness",
+        body: `Free-text AI output is hard to act on in a no-code environment. The AI Builder custom prompt is instructed to always return a JSON object with four typed fields. Power Automate's Parse JSON action then validates and extracts each field, so the Condition check on <code>answer_found</code> is a clean boolean gate.
+
+If the AI returns malformed JSON, the Parse JSON step fails and the run errors — which is preferable to silently sending a malformed reply to the Teams channel.`,
+      },
+      {
+        title: "Poll trigger instead of push — Teams connector limitation",
+        body: `Power Automate's Teams 'When a new channel message is added' trigger uses polling (every 1 minute on the standard tier) rather than a push webhook. This means there's up to a 60-second delay between a question being posted and the bot replying.
+
+For an IT Support Q&A bot, a 60-second response time is acceptable and often faster than waiting for a human teammate. A premium trigger or Azure Bot Framework integration would reduce latency to near-real-time but would require additional licensing.`,
+      },
+    ],
+
+    nextSteps: [
+      "Log answered questions and confidence scores to a SharePoint list for KB gap analysis",
+      "Add a 'thumbs up / thumbs down' reaction listener to collect implicit quality feedback on answers",
+      "Upgrade to per-channel adaptive polling — higher frequency during business hours, lower overnight",
+      "Add a KB admin command: a special message prefix that lets IT staff add a new KB entry directly from Teams",
+    ],
+  },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
