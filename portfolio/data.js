@@ -755,7 +755,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/jam-json-modifier/cover.png",
     date: "Sep 2026",
 
     overview: `Cross-platform Electron desktop application for working with JSON files at any scale. Combines a Monaco-powered editor (same engine as VS Code) with a live interactive tree view, a full set of transformation tools, and an AI-assisted repair feature powered by Claude Haiku. Ships as an NSIS installer and portable <code>.exe</code> for Windows, and a DMG for macOS.`,
