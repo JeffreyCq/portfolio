@@ -1055,7 +1055,7 @@ Every CTE join and anti-spam lock uses group_key, so user-based and IP-based eve
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/wazuh-weekly-soc-report/cover.png",
     date: "Sep 2026",
 
     overview: `A weekly reporting workflow that turns raw Wazuh Active Response logs into a polished security dashboard delivered to email every Monday at 8am.
