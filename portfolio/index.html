@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Jeffrey Cedeño</title>
+<meta name="description" content="Automation and integration projects by Jeffrey Cedeño — GoHighLevel, n8n, AWS Lambda, Power Automate.">
+<meta property="og:title" content="Portfolio — Jeffrey Cedeño">
+<meta property="og:description" content="Automation and integration projects: GoHighLevel, n8n, AWS Lambda, Power Automate.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jeffreycedeno.com/portfolio/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --bg:      #ffffff;
+  --ink:     #111111;
+  --ink2:    #444444;
+  --ink3:    #888888;
+  --accent:  #1a472a;
+  --border:  #e8e8e8;
+  --mono:    'DM Mono', monospace;
+  --sans:    'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ── Nav ── */
+nav {
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 52px;
+  z-index: 100;
+}
+.nav-logo {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.nav-logo:hover { color: var(--accent); }
+.nav-back {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink3);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: var(--ink); }
+
+/* ── Wrapper ── */
+.wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ── Header ── */
+.port-header {
+  padding: 3.5rem 0 2.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+}
+.port-header-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 0.6rem;
+}
+.port-header h1 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+}
+.port-header p {
+  font-size: 15px;
+  color: var(--ink2);
+  max-width: 520px;
+}
+
+/* ── Filter chips ── */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.chip:hover {
+  border-color: var(--ink3);
+  color: var(--ink);
+}
+.chip.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.chip[data-count]::after {
+  content: ' (' attr(data-count) ')';
+  opacity: 0.5;
+}
+
+/* ── Project grid ── */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+/* ── Card ── */
+.proj-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.proj-card:hover {
+  border-color: #bbb;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.proj-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.card-cover {
+  width: 100%;
+  aspect-ratio: 16/7;
+  object-fit: cover;
+  display: block;
+  background: #f4f4f4;
+}
+.card-cover-placeholder {
+  width: 100%;
+  aspect-ratio: 16/7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+}
+
+.card-body {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cat-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.status-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.status-completed { background: rgba(22,163,74,0.1); color: #166534; }
+.status-in-progress { background: rgba(217,119,6,0.1); color: #92400e; }
+.status-planned { background: #f3f4f6; color: var(--ink3); }
+
+.feat-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: rgba(26,71,42,0.08);
+  color: var(--accent);
+}
+
+.card-title {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.card-summary {
+  font-size: 13.5px;
+  color: var(--ink2);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: auto;
+}
+.tag-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: #f5f5f5;
+  color: var(--ink3);
+  border: 1px solid var(--border);
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink3);
+}
+.card-footer-link {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 3rem 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink3);
+}
+
+/* ── Footer ── */
+.port-footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 0 3rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.port-footer a { color: var(--ink3); text-decoration: none; }
+.port-footer a:hover { color: var(--ink); }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .wrapper { padding: 0 1rem; }
+  nav { padding: 0 1rem; }
+  .project-grid { grid-template-columns: 1fr; }
+  .port-header { padding: 2rem 0 2rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">jeffreycedeno.com</a>
+  <a href="/" class="nav-back">← Back</a>
+</nav>
+
+<div class="wrapper">
+
+  <header class="port-header">
+    <div class="port-header-label">jeffreycedeno.com / portfolio</div>
+    <h1>Automation Portfolio</h1>
+    <p>CRM integrations, automation workflows, and software builds across GoHighLevel, n8n, AWS Lambda, and Power Automate.</p>
+  </header>
+
+  <div class="filter-bar" id="filter-bar" role="group" aria-label="Filter by category"></div>
+
+  <div class="project-grid" id="project-grid"></div>
+
+  <footer class="port-footer">
+    <span>Jeffrey Cedeño · <a href="/">jeffreycedeno.com</a></span>
+    <span><a href="mailto:hello@jeffreycedeno.com">hello@jeffreycedeno.com</a></span>
+  </footer>
+
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  let activeFilter = 'all';
+
+  function statusClass(s) {
+    if (!s) return '';
+    const m = s.toLowerCase();
+    if (m === 'completed') return 'status-completed';
+    if (m.includes('progress')) return 'status-in-progress';
+    return 'status-planned';
+  }
+
+  function imgPlaceholder(cat) {
+    const c = getCategoryBySlug(cat);
+    return `<div class="card-cover-placeholder" style="background:${c.color};opacity:0.85;">${c.label}</div>`;
+  }
+
+  function renderCard(p) {
+    const cat = getCategoryBySlug(p.category);
+    const tagsHtml = (p.tags || []).slice(0, 4).map(t =>
+      `<span class="tag-pill">${t}</span>`
+    ).join('');
+
+    const coverHtml = p.cover
+      ? `<img class="card-cover" src="${p.cover}" alt="${p.title} cover" onerror="this.outerHTML=\`${imgPlaceholder(p.category).replace(/`/g, '\\`')}\`">`
+      : imgPlaceholder(p.category);
+
+    return `
+      <a class="proj-card" href="project.html?slug=${p.slug}" data-category="${p.category}">
+        ${coverHtml}
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="cat-badge" style="background:${cat.bg};color:${cat.color};">${cat.label}</span>
+            <span class="status-badge ${statusClass(p.status)}">${p.status}</span>
+            ${p.featured ? '<span class="feat-badge">Featured</span>' : ''}
+          </div>
+          <div class="card-title">${p.title}</div>
+          <div class="card-summary">${p.summary}</div>
+          ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ''}
+        </div>
+        <div class="card-footer">
+          <span>${p.date || ''}</span>
+          <span class="card-footer-link">View project →</span>
+        </div>
+      </a>`;
+  }
+
+  function renderGrid(filter) {
+    const grid = document.getElementById('project-grid');
+    const projects = getPublishedProjects().filter(p =>
+      filter === 'all' || p.category === filter
+    );
+
+    if (projects.length === 0) {
+      grid.innerHTML = '<div class="empty-state">No projects in this category yet.</div>';
+    } else {
+      grid.innerHTML = projects.map(renderCard).join('');
+    }
+  }
+
+  function renderFilters() {
+    const bar = document.getElementById('filter-bar');
+    const published = getPublishedProjects();
+
+    const allCount = published.length;
+    const chips = [{ slug: 'all', label: 'All', count: allCount }];
+
+    CATEGORIES.forEach(cat => {
+      const count = published.filter(p => p.category === cat.slug).length;
+      if (count > 0) chips.push({ slug: cat.slug, label: cat.label, count });
+    });
+
+    bar.innerHTML = chips.map(chip => `
+      <button class="chip${chip.slug === 'all' ? ' active' : ''}"
+              data-filter="${chip.slug}"
+              data-count="${chip.count}"
+              aria-pressed="${chip.slug === 'all'}">${chip.label}</button>
+    `).join('');
+
+    bar.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.filter;
+        bar.querySelectorAll('.chip').forEach(b => {
+          b.classList.toggle('active', b === btn);
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        renderGrid(activeFilter);
+      });
+    });
+  }
+
+  renderFilters();
+  renderGrid('all');
+})();
+</script>
+</body>
+</html>
