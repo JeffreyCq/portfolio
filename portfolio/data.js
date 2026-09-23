@@ -49,7 +49,7 @@ const PROJECTS = [
     status: "Completed",
     published: true,
     featured: true,
-    cover: "img/ghl-contractor-lead-system/cover.png",
+    cover: "img/ghl-contractor-lead-system/cover.png", // workflows list view
     date: "Sep 2026",
 
     note: "Portfolio/demo sub-account with fictional business data.",
@@ -229,10 +229,11 @@ const PROJECTS = [
     ],
 
     images: [
-      { src: "img/ghl-contractor-lead-system/a1-workflow.png", alt: "A1 – New Lead Intake & Routing workflow canvas" },
+      { src: "img/ghl-contractor-lead-system/a1-workflow.webp", alt: "A1 – New Lead Intake & Routing workflow canvas (full view at 29% zoom)" },
+      { src: "img/ghl-contractor-lead-system/custom-fields.png", alt: "Custom fields – Lead Details folder showing all 7 fields" },
+      { src: "img/ghl-contractor-lead-system/form.png", alt: "Free Estimate Request form with A2P-compliant SMS consent checkboxes" },
+      { src: "img/ghl-contractor-lead-system/tags.png", alt: "Tags list with prefixed naming convention and categories" },
       { src: "img/ghl-contractor-lead-system/pipelines.png", alt: "Residential Sales and Nurture pipeline boards" },
-      { src: "img/ghl-contractor-lead-system/custom-fields.png", alt: "Custom fields configuration in GHL" },
-      { src: "img/ghl-contractor-lead-system/form.png", alt: "Free Estimate Request form with SMS consent checkboxes" },
       { src: "img/ghl-contractor-lead-system/landing-page.png", alt: "Landing page funnel – desktop view" },
       { src: "img/ghl-contractor-lead-system/calendar-settings.png", alt: "Free Estimate Visit calendar settings" },
       { src: "img/ghl-contractor-lead-system/a2-workflow.png", alt: "A2 – Speed-to-Lead Follow-up workflow canvas" },
@@ -245,15 +246,12 @@ const PROJECTS = [
     ],
 
     imagesNeeded: [
-      "cover.png — A1 workflow canvas (zoomed out)",
-      "custom-fields.png",
-      "pipelines.png",
-      "form.png",
-      "landing-page.png (desktop + mobile)",
-      "calendar-settings.png",
-      "a1-workflow.png, a2-workflow.png, a2b-workflow.png, a2c-workflow.png",
-      "a1-execution-log-hot.png, a1-execution-log-warm.png, a1-execution-log-nurture.png",
-      "opportunities-board.png",
+      "pipelines.png — Residential Sales and Nurture pipeline boards",
+      "landing-page.png — landing page funnel (desktop + mobile)",
+      "calendar-settings.png — Free Estimate Visit calendar settings",
+      "a2-workflow.png, a2b-workflow.png, a2c-workflow.png — remaining workflow canvases",
+      "a1-execution-log-hot.png, a1-execution-log-warm.png, a1-execution-log-nurture.png — execution logs",
+      "opportunities-board.png — opportunities board after test runs",
     ],
   },
 
