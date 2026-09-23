@@ -1195,7 +1195,7 @@ The extended window catches slower coordinated scans that might spread events ju
     status: "Completed",
     published: true,
     featured: false,
-    cover: null,
+    cover: "img/grafana-crm-alerts-n8n/cover.png",
     date: "Sep 2026",
 
     overview: `Grafana monitors CRM integration health across dozens of active campaigns. When an integration fails, Grafana fires an alertmanager webhook — but the raw alert payload is noisy: it includes datasource errors, infrastructure alerts, and repeated firings for the same event.
