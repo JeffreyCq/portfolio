@@ -352,6 +352,47 @@ nav {
   overflow: visible;
 }
 
+/* ── BADGES ── */
+.badge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.badge-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px;
+  cursor: zoom-in;
+  transition: transform 0.15s, box-shadow 0.15s;
+  background: var(--bg);
+}
+.badge-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+.badge-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+.badge-overlay.open { display: flex; }
+.badge-overlay img {
+  max-width: min(320px, 85vw);
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+}
+
 /* ── BLOG ── */
 .blog-placeholder {
   padding: 1.5rem;
@@ -757,6 +798,25 @@ span[data-lang].active { display: inline; }
   </div>
 </section>
 
+<!-- BADGES -->
+<section class="section" id="badges">
+  <div class="section-label">
+    <span data-lang="en" class="active">Badges</span>
+    <span data-lang="es">Insignias</span>
+  </div>
+  <div class="section-content">
+    <div class="badge-grid">
+      <img class="badge-thumb" src="img/badges/dynatrace-essentials.png"      alt="Dynatrace Verified Essentials">
+      <img class="badge-thumb" src="img/badges/cisco-ccna-intro-networks.png" alt="Cisco CCNA Introduction to Networks">
+      <img class="badge-thumb" src="img/badges/cisco-intro-cybersecurity.png" alt="Cisco Introduction to Cybersecurity">
+    </div>
+  </div>
+</section>
+
+<div class="badge-overlay" id="badge-overlay">
+  <img id="badge-overlay-img" src="" alt="">
+</div>
+
 <!-- BLOG -->
 <section class="section" id="blog">
   <div class="section-label">Blog</div>
@@ -935,6 +995,25 @@ function drawCertLines() {
 
 window.addEventListener('load', drawCertLines);
 window.addEventListener('resize', drawCertLines);
+
+// ── BADGE LIGHTBOX ──
+(function () {
+  const overlay = document.getElementById('badge-overlay');
+  const overlayImg = document.getElementById('badge-overlay-img');
+
+  document.querySelectorAll('.badge-thumb').forEach(img => {
+    img.addEventListener('click', () => {
+      overlayImg.src = img.src;
+      overlayImg.alt = img.alt;
+      overlay.classList.add('open');
+    });
+  });
+
+  overlay.addEventListener('click', () => overlay.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') overlay.classList.remove('open');
+  });
+})();
 </script>
 </body>
 </html>
