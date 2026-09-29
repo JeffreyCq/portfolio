@@ -385,12 +385,46 @@ nav {
   cursor: zoom-out;
 }
 .badge-overlay.open { display: flex; }
-.badge-overlay img {
-  max-width: min(320px, 85vw);
-  max-height: 85vh;
+.badge-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  cursor: default;
+  max-width: min(340px, 88vw);
+}
+.badge-modal img {
+  width: 160px;
+  height: 160px;
   object-fit: contain;
-  border-radius: 10px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+.badge-modal-info {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  width: 100%;
+  text-align: center;
+}
+.badge-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.badge-modal-issuer {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+}
+.badge-modal-desc {
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.55;
+  margin: 0;
 }
 
 /* ── BLOG ── */
@@ -806,16 +840,39 @@ span[data-lang].active { display: inline; }
   </div>
   <div class="section-content">
     <div class="badge-grid">
-      <img class="badge-thumb" src="img/badges/dynatrace-essentials.png"      alt="Dynatrace Verified Essentials">
-      <img class="badge-thumb" src="img/badges/cisco-ccna-intro-networks.png" alt="Cisco CCNA Introduction to Networks">
-      <img class="badge-thumb" src="img/badges/cisco-intro-cybersecurity.png" alt="Cisco Introduction to Cybersecurity">
-      <img class="badge-thumb" src="img/badges/ai-fundamentals.png"           alt="AI Fundamentals Certified">
+      <img class="badge-thumb" src="img/badges/dynatrace-essentials.png"
+           alt="Dynatrace Verified Essentials"
+           data-title="Dynatrace Essentials"
+           data-issuer="Dynatrace"
+           data-desc="Validates core knowledge of the Dynatrace platform: monitoring, observability, and AIOps-driven insights for cloud environments.">
+      <img class="badge-thumb" src="img/badges/cisco-ccna-intro-networks.png"
+           alt="Cisco CCNA Introduction to Networks"
+           data-title="CCNA: Introduction to Networks"
+           data-issuer="Cisco Networking Academy"
+           data-desc="Covers networking fundamentals: IP addressing, routing, switching, network protocols, and basic infrastructure design.">
+      <img class="badge-thumb" src="img/badges/cisco-intro-cybersecurity.png"
+           alt="Cisco Introduction to Cybersecurity"
+           data-title="Introduction to Cybersecurity"
+           data-issuer="Cisco Networking Academy"
+           data-desc="Introduces cybersecurity concepts: threat landscape, common attacks, network security defenses, and best practices for data protection.">
+      <img class="badge-thumb" src="img/badges/ai-fundamentals.png"
+           alt="AI Fundamentals Certified"
+           data-title="AI Fundamentals"
+           data-issuer="Certified"
+           data-desc="Demonstrates foundational understanding of artificial intelligence concepts, machine learning models, and practical AI applications.">
     </div>
   </div>
 </section>
 
 <div class="badge-overlay" id="badge-overlay">
-  <img id="badge-overlay-img" src="" alt="">
+  <div class="badge-modal">
+    <img id="badge-overlay-img" src="" alt="">
+    <div class="badge-modal-info">
+      <div class="badge-modal-title" id="badge-modal-title"></div>
+      <div class="badge-modal-issuer" id="badge-modal-issuer"></div>
+      <p class="badge-modal-desc" id="badge-modal-desc"></p>
+    </div>
+  </div>
 </div>
 
 <!-- BLOG -->
@@ -999,18 +1056,26 @@ window.addEventListener('resize', drawCertLines);
 
 // ── BADGE LIGHTBOX ──
 (function () {
-  const overlay = document.getElementById('badge-overlay');
-  const overlayImg = document.getElementById('badge-overlay-img');
+  const overlay   = document.getElementById('badge-overlay');
+  const oImg      = document.getElementById('badge-overlay-img');
+  const oTitle    = document.getElementById('badge-modal-title');
+  const oIssuer   = document.getElementById('badge-modal-issuer');
+  const oDesc     = document.getElementById('badge-modal-desc');
 
   document.querySelectorAll('.badge-thumb').forEach(img => {
     img.addEventListener('click', () => {
-      overlayImg.src = img.src;
-      overlayImg.alt = img.alt;
+      oImg.src        = img.src;
+      oImg.alt        = img.alt;
+      oTitle.textContent  = img.dataset.title  || img.alt;
+      oIssuer.textContent = img.dataset.issuer || '';
+      oDesc.textContent   = img.dataset.desc   || '';
       overlay.classList.add('open');
     });
   });
 
-  overlay.addEventListener('click', () => overlay.classList.remove('open'));
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') overlay.classList.remove('open');
   });
