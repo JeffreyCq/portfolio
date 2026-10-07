@@ -940,9 +940,35 @@ function setLang(lang) {
 // Blog / Medium RSS — set your username here when ready
 const MEDIUM_USERNAME = '';
 
+// Local posts (newest first)
+const LOCAL_POSTS = [
+  {
+    href: 'blog/auri-commit-gatekeeper.html',
+    hrefEs: 'blog/auri-portero-commits.html',
+    date: '2026-10-07',
+    title: 'A Bouncer for Your Commits: How AURI Audited My App (and My Ego)',
+    excerpt: 'Claude Code hooks + AURI (Endor Labs) to scan every commit before it enters the repo, and the 93 findings it uncovered in my own security app.'
+  }
+];
+
 async function loadBlog() {
   const grid = document.getElementById('blog-grid');
   if (!grid) return;
+
+  if (LOCAL_POSTS.length) {
+    grid.innerHTML = `<div class="blog-card-grid">${LOCAL_POSTS.map(post => {
+      const date = new Date(post.date + 'T00:00:00').toLocaleDateString('en', { year: 'numeric', month: 'short', day: 'numeric' });
+      const es = post.hrefEs ? ` · <a href="${post.hrefEs}" class="inline-link" hreflang="es">Leer en español</a>` : '';
+      return `<div class="blog-card">
+        <div class="blog-card-meta">${date}${es}</div>
+        <a href="${post.href}" style="text-decoration:none;color:inherit;display:block;">
+          <div class="blog-card-title">${post.title}</div>
+          <div class="blog-card-excerpt">${post.excerpt}</div>
+        </a>
+      </div>`;
+    }).join('')}</div>`;
+    return;
+  }
 
   if (!MEDIUM_USERNAME) {
     const curLang = document.querySelector('.lang-btn.active')?.textContent.toLowerCase() || 'en';

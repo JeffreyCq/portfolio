@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Bouncer for Your Commits — Jeffrey Cedeño</title>
+<meta name="description" content="How I used AURI (Endor Labs) and Claude Code hooks to scan every commit, and what it found in my own security app.">
+<meta property="og:title" content="A Bouncer for Your Commits: How AURI Audited My App (and My Ego)">
+<meta property="og:description" content="How I used AURI (Endor Labs) and Claude Code hooks to scan every commit, and what it found in my own security app.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="img/auri-portero-commits/portero-cover.webp">
+<link rel="alternate" hreflang="es" href="auri-portero-commits.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg: #ffffff; --ink: #111111; --ink2: #444444; --ink3: #888888;
+  --accent: #1a472a; --border: #e8e8e8;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif; --display: 'Syne', sans-serif;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.7; }
+
+nav {
+  position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: space-between; padding: 0 2rem; height: 52px; z-index: 100;
+}
+.nav-logo { font-family: var(--mono); font-size: 13px; color: var(--ink); text-decoration: none; }
+.nav-logo:hover { color: var(--accent); }
+.nav-right { display: flex; gap: 1.25rem; align-items: center; }
+.nav-back, .nav-lang { font-family: var(--mono); font-size: 12px; color: var(--ink3); text-decoration: none; }
+.nav-back:hover, .nav-lang:hover { color: var(--ink); }
+.nav-lang { border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; }
+
+.outer { max-width: 760px; margin: 0 auto; padding: 0 2rem; }
+.post-hero { padding: 2.5rem 0 2rem; }
+.post-meta { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-bottom: 0.75rem; }
+.post-title {
+  font-family: var(--display); font-size: clamp(1.7rem, 4.5vw, 2.4rem);
+  font-weight: 800; line-height: 1.15; letter-spacing: -0.02em;
+}
+
+article p { color: var(--ink2); font-size: 15.5px; margin-bottom: 1.1rem; }
+article h2 {
+  font-family: var(--display); font-size: 1.4rem; font-weight: 700; line-height: 1.25;
+  margin: 2.5rem 0 1rem; letter-spacing: -0.01em; scroll-margin-top: 70px;
+}
+article h3 { font-family: var(--display); font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.75rem; }
+article ul, article ol { margin: 0 0 1.1rem 1.4rem; color: var(--ink2); font-size: 15.5px; }
+article li { margin-bottom: 0.45rem; padding-left: 0.2rem; }
+article a { color: var(--accent); }
+article strong { color: var(--ink); }
+
+code {
+  font-family: var(--mono); font-size: 0.88em; background: #f3f4f6;
+  padding: 1px 5px; border-radius: 3px; color: var(--ink);
+}
+pre {
+  background: #0f1412; color: #e6ede9; border-radius: 8px; padding: 1.1rem 1.25rem;
+  overflow-x: auto; margin: 0 0 1.4rem; font-size: 12.5px; line-height: 1.6;
+}
+pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+.code-label { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-bottom: 0.4rem; }
+
+blockquote {
+  background: #f5faf6; border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  padding: 0.8rem 1.1rem; margin: 0 0 1.4rem;
+}
+blockquote p { margin: 0; font-size: 14.5px; }
+
+figure { margin: 1.5rem 0 1.8rem; }
+figure img {
+  width: 100%; height: auto; display: block; border: 1px solid var(--border);
+  border-radius: 8px; cursor: zoom-in;
+}
+figcaption { font-family: var(--mono); font-size: 11.5px; color: var(--ink3); margin-top: 0.5rem; }
+
+.table-wrap { overflow-x: auto; margin: 0 0 1.4rem; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th {
+  font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink3); font-weight: 500; text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--border); background: #fafafa;
+}
+td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; color: var(--ink2); }
+
+.links-box { border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; margin: 1rem 0 0; }
+.links-box ul { margin-bottom: 0; list-style: none; margin-left: 0; }
+.links-box li { padding-left: 0; }
+.links-box a { font-family: var(--mono); font-size: 13px; text-decoration: none; }
+.links-box a:hover { opacity: 0.65; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999;
+  align-items: center; justify-content: center; cursor: zoom-out; padding: 2rem;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
+
+.port-footer {
+  border-top: 1px solid var(--border); padding: 1.5rem 0 3rem; margin-top: 3rem;
+  font-family: var(--mono); font-size: 12px; color: var(--ink3);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+.port-footer a { color: var(--ink3); text-decoration: none; }
+.port-footer a:hover { color: var(--ink); }
+
+@media (max-width: 600px) {
+  .outer { padding: 0 1rem; }
+  nav { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">jeffreycedeno.com</a>
+  <div class="nav-right">
+    <a href="auri-portero-commits.html" class="nav-lang" hreflang="es">Leer en español</a>
+    <a href="../index.html#blog" class="nav-back">← Blog</a>
+  </div>
+</nav>
+
+<div class="outer">
+  <header class="post-hero">
+    <div class="post-meta">Oct 7, 2026 · AppSec · DevSecOps · Claude Code</div>
+    <h1 class="post-title">A Bouncer for Your Commits: How AURI Audited My App (and My Ego)</h1>
+  </header>
+
+  <article>
+    <figure style="margin-top:0">
+      <img src="img/auri-portero-commits/portero-cover.webp" alt="A nightclub bouncer stops an unaudited commit at the door">
+    </figure>
+
+    <p>Let's be realistic: these days, people just getting into programming take it for granted that Claude, ChatGPT, Cursor, or whatever flavor of AI you prefer will write clean, well-structured, commented code that is fully hardened against every vulnerability. Most of these "helpers" even warn us: treat this code as boilerplate or an MVP that needs review. You don't tell Claude "build a SaaS and deploy it" and then sit back laughing while you toast champagne to your first successful funding round. WRONG. That is not what happens.</p>
+
+    <p>What actually happens is this: you build your app in record time, skip the code review, make a commit, push to GitHub, deploy to your favorite host, and forget about everything else. I think we're skipping an important step, one that we could add to our development flow with little to no effort, whether you're a <em>vibe coder</em> or a "traditional" programmer who uses AI as an assistant and not as an underpaid junior developer.</p>
+
+    <p>I'm talking specifically about <strong>AppSec</strong> (application security) tools. The AI itself can already do some of this, but it's not the same as a tool built to find exposed tokens, outdated dependencies, errors that leak internal information, and the like.</p>
+
+    <p>In other times (or in this same era, without MCP) we could use tools like <code>pip-audit</code>, <code>npm audit</code>, or <code>semgrep</code>, and get a result similar to what the tool I'm about to show you gives. I'm only talking about the free version of this one, because the paid version looks MUCH more complete. But free or not, this is something many new programmers are ignoring completely: apps get deployed every day with zero attention to the security of secrets, personal data, or any confidential information. Apps with outdated libraries and known vulnerabilities, simply because the AI used and suggested them.</p>
+
+    <p>With an MCP in the loop, it's much easier for anyone who wants to ship an app in record time to have a minimum of security. I'm talking about <strong>AURI</strong>, an MCP from <strong>Endor Labs</strong> whose free tier lets us run a vulnerability scan locally, from our own assistant, on our shiny new app. Less time spent and less risk from deploying without a decent process behind it.</p>
+
+    <h2>What is AURI and what is it for?</h2>
+
+    <p>Basically, AURI is a <strong>security reviewer for your code</strong>. You connect it to your AI assistant of choice and it checks several things, even on the free tier: the libraries your project uses and the code you wrote (or that an AI wrote for you, wink wink).</p>
+
+    <p>What it's for:</p>
+    <ul>
+      <li><strong>Libraries with known flaws.</strong> Almost every project uses other people's code, and security bugs are sometimes discovered in that code after you installed it. AURI compares the versions you use against a list of known flaws and tells you which version to upgrade to.</li>
+      <li><strong>Bugs in your own code.</strong> It flags bad practices, like showing internal error messages to users.</li>
+      <li><strong>Forgotten keys.</strong> It looks for passwords or tokens that were left written in the repository.</li>
+      <li><strong>Malicious packages.</strong> It can check whether a package is dangerous before you install it.</li>
+    </ul>
+
+    <figure>
+      <img src="img/auri-portero-commits/scan-resultado.png" alt="AURI scan result with findings sorted by severity">
+      <figcaption>An AURI scan: findings sorted by severity.</figcaption>
+    </figure>
+
+    <h2>Why is it useful with AI-assisted development?</h2>
+
+    <p>Trust me: an AI is very fast and knows a lot, but it doesn't always get decisions right. In the end it will pick whatever it considers most convenient, and you have to keep in mind two little things called <strong>hallucinations</strong> and <strong>biases</strong>: problems that come from the data the model was trained on. Every provider works daily to reduce them, but they're not 100% eliminated.</p>
+
+    <p>I'm sure you've asked your AI of choice for a Docker container for an app that would do wonders. It suggested a stack, and when you bring up <code>docker compose</code> you find that one of the requirements throws an error because it <em>doesn't exist</em>. That happens because the AI gave you a library name that was misspelled, obsolete, or flat-out invented.</p>
+
+    <p>And from there comes an even bigger cybersecurity problem that many ignore: <strong>package impersonation</strong>. It doesn't take much for an attacker to publish a library with a name similar to a legitimate one (or exactly the one the AI tends to invent) and wait for someone to install it without checking. It even has names: <em>typosquatting</em> when the error is a typo, and <em>slopsquatting</em> when the name was hallucinated by an AI.</p>
+
+    <p>This is where AURI comes in. It reviews dependencies and, based on its data, suggests the changes you need: an outdated library with known vulnerabilities, for example. In these cases, a tool like this is a lifesaver while programming, especially when time is critical.</p>
+
+    <h2>AURI in the middle of the implementation phase</h2>
+
+    <p>Let's be honest: in small or single-developer apps we love to jump straight to CD and forget about CI. Of course, it's the most tedious part. We all want to see our app live and put it on GitHub and LinkedIn so the world sees how proactive we are and how much we love creating. It sounds fun and efficient, but it's not ideal: the CI phase matters even in small projects, because that's where we run the tests and checks that prevent a mistake capable of compromising our app.</p>
+
+    <blockquote>
+      <p><strong>CI/CD in one line:</strong> CI (continuous integration) means checking the code every time it changes; CD (continuous deployment) means publishing it automatically once it passed that check.</p>
+    </blockquote>
+
+    <p>In security terms, AURI fits in that CI phase. It checks dependencies, secrets, and our own code (note: not infrastructure, like nginx or Docker). Every time we make a change it can analyze the project and give us suggestions to fix things before deployment.</p>
+
+    <p>Now you're probably wondering: how am I supposed to do this if my infrastructure isn't that of a multi-billion-dollar company? I don't have thousands of dollars for a pipeline on AWS or Azure with CodePipeline, ECR, Fargate and friends. It's just me and my commits against the world. But even if the app is small, with a bit of ingenuity and free tools like AURI there's always a solution.</p>
+
+    <p>An important detail: Endor Labs' free tier doesn't let us use AURI in GitHub Actions. There is an official action, but it requires a <em>tenant</em> (namespace) that the free plan doesn't include. It would have been fantastic to run AURI from GitHub before every deployment, but I couldn't find a way (in fact, my attempt to get a tenant ended on a screen that said "No authorized tenant found").</p>
+
+    <figure>
+      <img src="img/auri-portero-commits/sin-tenant.png" alt="Endor Labs screen: No authorized tenant found">
+      <figcaption>Where my attempt to get a tenant on the free tier ended.</figcaption>
+    </figure>
+
+    <p>The solution is to automate AURI locally, <strong>before making a commit</strong>. With a Python script I stop any commit made from Claude so that AURI reviews it first, shows me the findings, and lets me decide: fix them, or commit at my own risk.</p>
+
+    <h2>The <code>git commit</code> bouncer</h2>
+
+    <p>Claude Code lets you configure <em>hooks</em>: commands that run on their own before or after Claude uses a tool. With that I built a nightclub bouncer, but for commits: nobody gets in without going through AURI.</p>
+
+    <figure>
+      <img src="img/auri-portero-commits/flujo-portero.webp" alt="Flow diagram of the commit bouncer using Claude Code hooks and AURI">
+      <figcaption>The full flow: block, scan, marker, retry.</figcaption>
+    </figure>
+
+    <h3>How it works</h3>
+    <ol>
+      <li><strong>Before the commit.</strong> Every time Claude is about to run something in the terminal, the bouncer looks at what it is. If it's not a <code>git commit</code>, it lets it through without asking anything. If it is, it checks whether the current state of the files has already been scanned. If not, it <strong>blocks the commit</strong> and leaves Claude a note with instructions.</li>
+      <li><strong>Claude scans.</strong> Following the note, Claude calls AURI's <code>scan</code> (dependencies, secrets, and code analysis) and shows you the findings by severity.</li>
+      <li><strong>The bouncer takes note.</strong> When the scan finishes, a second hook saves a marker: "this exact state of the project has been reviewed".</li>
+      <li><strong>Claude retries.</strong> Now the bouncer finds the marker and lets the commit through.</li>
+    </ol>
+
+    <p>If you change even one line after the scan, the marker no longer matches and you have to scan again. That way nobody reviews one version and commits another.</p>
+
+    <h3>The state fingerprint</h3>
+    <p>To know whether something changed, the script computes a hash (SHA-256) from the path and content of every modified or new file. It doesn't depend on what's in <em>staging</em>, so a <code>git add</code> doesn't invalidate the marker. Markers live in <code>.git/auri-scan/</code>, so they're never pushed to the repository.</p>
+
+    <h3>Why does the script block, and not AURI?</h3>
+    <p>AURI's MCP can only be called by Claude, not by the system, so a regular git hook can't talk to it. The trick is to block the commit and force Claude to run the scan: the bouncer doesn't review anything, it just makes sure somebody does.</p>
+
+    <h3>The script</h3>
+    <div class="code-label">.claude/hooks/auri_gate.py</div>
+<pre><code>"""Gate `git commit` behind an AURI scan.
+
+pre  (PreToolUse on Bash): block `git commit` unless the current working-tree
+     state was already scanned; tell Claude to run the scan and report.
+post (PostToolUse on the AURI `scan` tool): record the scanned state.
+
+The state fingerprint hashes every changed/untracked file by path and content,
+so it does not depend on what is staged.
+"""
+import hashlib
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+def git(*args):
+    return subprocess.run(
+        ["git", *args], capture_output=True, check=True
+    ).stdout
+
+def fingerprint():
+    h = hashlib.sha256()
+    out = git("status", "--porcelain", "-uall", "-z").decode("utf-8", "replace")
+    paths = set()
+    entries = out.split("\0")
+    i = 0
+    while i &lt; len(entries):
+        e = entries[i]
+        i += 1
+        if len(e) &lt; 4:
+            continue
+        status, path = e[:2], e[3:]
+        paths.add(path)
+        if status[0] in "RC":  # rename/copy: next entry is the original path
+            i += 1
+    root = Path(git("rev-parse", "--show-toplevel").decode().strip())
+    for p in sorted(paths):
+        h.update(p.encode())
+        f = root / p
+        h.update(f.read_bytes() if f.is_file() else b"&lt;missing&gt;")
+    return h.hexdigest()
+
+def marker_dir():
+    d = Path(git("rev-parse", "--git-dir").decode().strip()) / "auri-scan"
+    d.mkdir(exist_ok=True)
+    return d
+
+def main():
+    mode = sys.argv[1]
+    data = json.load(sys.stdin)
+
+    if mode == "post":
+        (marker_dir() / fingerprint()).write_text("ok")
+        return 0
+
+    cmd = (data.get("tool_input") or {}).get("command", "")
+    if not re.search(r"\bgit\s+(?:-\S+\s+)*commit\b", cmd):
+        return 0
+    if (marker_dir() / fingerprint()).exists():
+        return 0
+
+    sys.stderr.write(
+        "Commit blocked: this working-tree state has not been scanned with AURI.\n"
+        "1. Call mcp__endor-cli-tools__scan with path = the repository root, "
+        'scan_types ["vulnerabilities","secrets","dependencies","sast"], '
+        'scan_options {"summary": true, "exclude_path": ["**/node_modules/**","**/dist/**"]}.\n'
+        "2. Show the user the findings grouped by severity (and any new HIGH/CRITICAL "
+        "ones introduced by this change). Do not hide findings.\n"
+        "3. Then retry the same git commit. Findings alone do not block the commit; "
+        "the user decides.\n"
+        "Any edit after the scan requires a new scan.\n"
+    )
+    return 2
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except Exception as exc:  # never break the session because of the gate itself
+        sys.stderr.write(f"auri_gate: {exc}\n")
+        sys.exit(0)</code></pre>
+
+    <h3>How to enable it</h3>
+    <p>Save the script as <code>.claude/hooks/auri_gate.py</code> and register it in <code>.claude/settings.local.json</code>:</p>
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/auri_gate.py\" pre" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__endor-cli-tools__scan",
+        "hooks": [
+          { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/auri_gate.py\" post" }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+    <h3>But does it actually work? The test</h3>
+    <p>Because a script that "should work" is not a script that works. I made a real, minimal change (adding <code>test_email.txt</code> to <code>.gitignore</code>, because it contained my real email headers, oops) and asked Claude to commit it. Here's what happened:</p>
+    <ol>
+      <li><strong>The bouncer stopped me at the door.</strong> The commit was canceled and Claude received the note: "Commit blocked: this working-tree state has not been scanned with AURI".</li>
+      <li><strong>Claude ran the AURI scan</strong> following that note and brought me the summary: <strong>23 findings</strong> (15 critical, 3 high, 4 medium and 1 low). None new from my change.</li>
+      <li><strong>Second attempt, and in.</strong> With the marker saved, the commit went through without drama.</li>
+      <li><strong>To prove it can't be fooled,</strong> I edited the file again and tried to commit without scanning. Blocked again. The bouncer can't be bribed.</li>
+    </ol>
+
+    <figure>
+      <img src="img/auri-portero-commits/commit-bloqueado.png" alt="Terminal showing the hook error: Commit blocked">
+      <figcaption>The hook blocking the commit and leaving a note for Claude.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="img/auri-portero-commits/resumen-23.png" alt="AURI scan summary: 23 findings by severity">
+      <figcaption>Scan summary: 15 critical, 3 high, 4 medium and 1 low.</figcaption>
+    </figure>
+
+    <p>A stumble I'll save you from: if you chain everything on one line (<code>edit &amp;&amp; git add &amp;&amp; git commit</code>), the bouncer cancels <strong>the entire command</strong> before anything runs, including your edit. The marker is only valid for the state that exists at that moment, so first edit and <code>git add</code> in one command, and leave the commit for another.</p>
+
+    <h3>What this bouncer does NOT do (because overpromising is rude)</h3>
+    <ul>
+      <li><strong>It doesn't block on findings.</strong> It only blocks when a scan hasn't been run. The final decision is yours: fix, or commit at your own risk.</li>
+      <li><strong>It only watches commits made from Claude.</strong> If you type <code>git commit</code> yourself in your terminal, the bouncer never knows. It's a personal filter, not a replacement for a real CI.</li>
+      <li><strong>If the bouncer goes down, it doesn't lock you out.</strong> If the script errors, it lets the commit through instead of breaking the session.</li>
+      <li><strong>Every commit takes as long as the scan takes.</strong> And it scans the whole repo, not just your change, so you'll see the same findings until you resolve them.</li>
+    </ul>
+
+    <h2>A real use case</h2>
+
+    <p>As a hobbyist app developer, I have a website for checking emails. What the app does is take an <code>.eml</code> (a raw email) and, with a small AI (specifically one trained only for this function; they're called <strong>BERT</strong> and there are several versions), scan it and give you a <em>score</em> and <em>insights</em> on whether the email is legitimate or whether there are signs of phishing, <em>whaling</em>, <em>spear phishing</em> and the like. The tool uses several OSINT sources to check IPs, links and addresses, and has an API that can be called from other apps. It works great for automations from Jira, for example, calling it from a workflow.</p>
+
+    <p>I used AURI to scan my code, which according to me and my big ego <strong>should have no compromised libraries and no flaws</strong>. But that wasn't the case (<em>HURT EGO</em>). A security app with half-baked security; the irony isn't lost on me.</p>
+
+    <figure>
+      <img src="img/auri-portero-commits/maildefender.png" alt="MailDefender analyzing a phishing email with a 100/100 risk score">
+      <figcaption>MailDefender analyzing a phishing email.</figcaption>
+    </figure>
+
+    <h3>What AURI found: 93 findings</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Count</th></tr></thead>
+        <tbody>
+          <tr><td>Dependency vulnerabilities</td><td>69 (1 critical, 34 high, 26 medium, 8 low)</td></tr>
+          <tr><td>Own code (static analysis)</td><td>24</td></tr>
+          <tr><td>Exposed secrets or tokens</td><td><strong>0</strong> (thank goodness)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Most of it came from the same thing: versions pinned months ago that nobody looked at again. Some of the stars:</p>
+    <ul>
+      <li><strong><code>aiohttp 3.10.5</code>: 31 advisories</strong>, including a critical one (the parser accepted null bytes and control characters in response headers). An important nuance here: most of those advisories affect the <em>server</em> side of the library, and my app uses it only as a <em>client</em> (to call VirusTotal and friends). Even so, upgrading cost one line.</li>
+      <li><strong><code>aiosmtplib</code>: SMTP command injection.</strong> My favorite on the list, because it really applied. My app replies to whoever forwards it an email using the sender's address, and that address is controlled by whoever sends it. With line breaks in it, someone could sneak in SMTP commands. Fix: upgrade from 3.0.1 to 5.1.3.</li>
+      <li><strong><code>python-multipart</code> and <code>starlette</code>: denial of service</strong> in forms. My email upload endpoints are open to anyone, so a malformed body or unbounded headers could exhaust CPU or memory.</li>
+      <li><strong>Frontend (<code>vite</code>, <code>postcss</code> and friends):</strong> more than a dozen advisories, all in <em>build</em> tools. They don't affect the compiled site, but a vulnerable dev server on a developer's machine is no joke.</li>
+      <li><strong>Own code: exposed error messages.</strong> Five scanners (VirusTotal, AbuseIPDB, urlscan and the AI analyzer) returned <code>str(e)</code> to the client when something failed. That kind of exception can leak paths, internal URLs or versions. Now the detail goes to the log and the user gets a generic message.</li>
+    </ul>
+
+    <figure>
+      <img src="img/auri-portero-commits/antes-despues.webp" alt="MailDefender: AURI scan before and after, from 93 to 23 findings">
+      <figcaption>From 93 findings to 23, and the 5 fixes that mattered most.</figcaption>
+    </figure>
+
+    <h3>What wasn't such a big deal (the noise)</h3>
+    <p>A big part of what it found was noise, and learning to tell the difference is part of the job:</p>
+    <ul>
+      <li><strong>15 "critical" findings for using <code>random</code></strong>, in the script that generates my synthetic training data. It doesn't generate keys or tokens, so it's a false positive. Switching to <code>secrets</code> would only break the reproducibility of my dataset.</li>
+      <li>A couple of advisories in a dev script that runs on my machine, with a fixed URL.</li>
+      <li>A handful of advisories in Tailwind <em>build</em> tools, with no patch available, that are fixed with a major migration deserving its own PR.</li>
+    </ul>
+
+    <h3>After fixing</h3>
+    <p>I bumped the versions, tested the app (it starts, responds, and analyzes emails just like before) and scanned again: from <strong>93 findings down to 23</strong>. Of those 23, 15 are the <code>random</code> false positive and the rest are dev tools or things with no patch. All vulnerabilities in <code>aiohttp</code>, <code>python-multipart</code>, <code>starlette</code> and <code>aiosmtplib</code> were closed.</p>
+
+    <h2>Conclusions</h2>
+    <p>After this whole journey, here are my conclusions:</p>
+    <ol>
+      <li><strong>My ego didn't survive, but my app did, and better.</strong> I closed 65 of the 69 dependency vulnerabilities, and the one I cared about most (the SMTP injection) was in a library I didn't even know was outdated.</li>
+      <li><strong>A tool doesn't replace judgment.</strong> Of 93 findings, 15 "critical" ones were noise and the most important one in practice was only marked "high". AURI finds; deciding what matters in <em>your</em> app is still your job.</li>
+      <li><strong>AI writes fast, but doesn't review what it writes.</strong> Almost the whole problem came from versions that someone (an AI, me, doesn't matter) pinned once and never looked at again. Putting the review in the same flow where the code is generated changes everything.</li>
+      <li><strong>Security doesn't have to cost an enterprise pipeline.</strong> With a free MCP, a script of about 90 lines and a bouncer that can't be bribed, a one-person project can have a reasonable filter before every commit.</li>
+      <li><strong>Let's be honest about the limitations.</strong> The free tier doesn't run on GitHub Actions, the bouncer only watches commits that go through Claude, and this doesn't replace a real CI with infrastructure review. It's a first filter, not the Great Wall of China.</li>
+    </ol>
+
+    <p>My advice: if you use AI to code, run your project through a tool like this <strong>before</strong> deploying. It takes little time, costs nothing, and keeps your app from becoming somebody else's lesson on Twitter. I already feel calmer, and a bit happier making my commits, knowing that before anything enters my repository it goes through a bouncer that can't be bribed.</p>
+
+    <p>And you, how many vulnerabilities do you think your app has right now? I thought none, too.</p>
+
+    <h2>Useful links</h2>
+    <div class="links-box">
+      <ul>
+        <li><a href="https://www.endorlabs.com/" target="_blank" rel="noopener">↗ Endor Labs</a></li>
+        <li><a href="https://www.endorlabs.com/auri" target="_blank" rel="noopener">↗ AURI for Developers (Endor Labs)</a></li>
+        <li><a href="https://docs.endorlabs.com/secure-ai-coding/" target="_blank" rel="noopener">↗ AURI documentation: Secure AI Coding</a></li>
+        <li><a href="https://maildefender.xyz" target="_blank" rel="noopener">↗ MailDefender: maildefender.xyz</a></li>
+      </ul>
+    </div>
+  </article>
+
+  <footer class="port-footer">
+    <span>Jeffrey Cedeño · <a href="/">jeffreycedeno.com</a></span>
+    <span><a href="mailto:hello@jeffreycedeno.com">hello@jeffreycedeno.com</a></span>
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged view">
+  <img id="lb-img" src="" alt="">
+</div>
+
+<script>
+(function () {
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  document.querySelectorAll('article figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  function close() { lb.classList.remove('open'); document.body.style.overflow = ''; }
+  lb.addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+</script>
+</body>
+</html>

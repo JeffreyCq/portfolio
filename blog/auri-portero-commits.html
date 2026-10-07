@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Un portero para tus commits — Jeffrey Cedeño</title>
+<meta name="description" content="Cómo usé AURI (Endor Labs) y hooks de Claude Code para escanear cada commit, y qué encontró en mi propia app de seguridad.">
+<meta property="og:title" content="Un portero para tus commits: cómo AURI auditó mi app (y mi ego)">
+<meta property="og:description" content="Cómo usé AURI (Endor Labs) y hooks de Claude Code para escanear cada commit, y qué encontró en mi propia app de seguridad.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="img/auri-portero-commits/portero-cover.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg: #ffffff; --ink: #111111; --ink2: #444444; --ink3: #888888;
+  --accent: #1a472a; --border: #e8e8e8;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif; --display: 'Syne', sans-serif;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.7; }
+
+nav {
+  position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: space-between; padding: 0 2rem; height: 52px; z-index: 100;
+}
+.nav-logo { font-family: var(--mono); font-size: 13px; color: var(--ink); text-decoration: none; }
+.nav-logo:hover { color: var(--accent); }
+.nav-back { font-family: var(--mono); font-size: 12px; color: var(--ink3); text-decoration: none; }
+.nav-back:hover { color: var(--ink); }
+
+.outer { max-width: 760px; margin: 0 auto; padding: 0 2rem; }
+.post-hero { padding: 2.5rem 0 2rem; }
+.post-meta { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-bottom: 0.75rem; }
+.post-title {
+  font-family: var(--display); font-size: clamp(1.7rem, 4.5vw, 2.4rem);
+  font-weight: 800; line-height: 1.15; letter-spacing: -0.02em;
+}
+.post-cover { width: 100%; border: 1px solid var(--border); border-radius: 8px; display: block; margin-bottom: 2rem; }
+
+article p { color: var(--ink2); font-size: 15.5px; margin-bottom: 1.1rem; }
+article h2 {
+  font-family: var(--display); font-size: 1.4rem; font-weight: 700; line-height: 1.25;
+  margin: 2.5rem 0 1rem; letter-spacing: -0.01em; scroll-margin-top: 70px;
+}
+article h3 { font-family: var(--display); font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.75rem; }
+article ul, article ol { margin: 0 0 1.1rem 1.4rem; color: var(--ink2); font-size: 15.5px; }
+article li { margin-bottom: 0.45rem; padding-left: 0.2rem; }
+article a { color: var(--accent); }
+article strong { color: var(--ink); }
+
+code {
+  font-family: var(--mono); font-size: 0.88em; background: #f3f4f6;
+  padding: 1px 5px; border-radius: 3px; color: var(--ink);
+}
+pre {
+  background: #0f1412; color: #e6ede9; border-radius: 8px; padding: 1.1rem 1.25rem;
+  overflow-x: auto; margin: 0 0 1.4rem; font-size: 12.5px; line-height: 1.6;
+}
+pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+.code-label { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-bottom: 0.4rem; }
+
+blockquote {
+  background: #f5faf6; border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  padding: 0.8rem 1.1rem; margin: 0 0 1.4rem;
+}
+blockquote p { margin: 0; font-size: 14.5px; }
+
+figure { margin: 1.5rem 0 1.8rem; }
+figure img {
+  width: 100%; height: auto; display: block; border: 1px solid var(--border);
+  border-radius: 8px; cursor: zoom-in;
+}
+figcaption { font-family: var(--mono); font-size: 11.5px; color: var(--ink3); margin-top: 0.5rem; }
+
+.table-wrap { overflow-x: auto; margin: 0 0 1.4rem; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th {
+  font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink3); font-weight: 500; text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--border); background: #fafafa;
+}
+td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; color: var(--ink2); }
+
+.links-box { border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; margin: 1rem 0 0; }
+.links-box ul { margin-bottom: 0; list-style: none; margin-left: 0; }
+.links-box li { padding-left: 0; }
+.links-box a { font-family: var(--mono); font-size: 13px; text-decoration: none; }
+.links-box a:hover { opacity: 0.65; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999;
+  align-items: center; justify-content: center; cursor: zoom-out; padding: 2rem;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
+
+.port-footer {
+  border-top: 1px solid var(--border); padding: 1.5rem 0 3rem; margin-top: 3rem;
+  font-family: var(--mono); font-size: 12px; color: var(--ink3);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+.port-footer a { color: var(--ink3); text-decoration: none; }
+.port-footer a:hover { color: var(--ink); }
+
+@media (max-width: 600px) {
+  .outer { padding: 0 1rem; }
+  nav { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">jeffreycedeno.com</a>
+  <div style="display:flex;gap:1.25rem;align-items:center;">
+    <a href="auri-commit-gatekeeper.html" class="nav-back" hreflang="en" style="border:1px solid var(--border);border-radius:4px;padding:2px 8px;">Read in English</a>
+    <a href="../index.html#blog" class="nav-back">← Blog</a>
+  </div>
+</nav>
+
+<div class="outer">
+  <header class="post-hero">
+    <div class="post-meta">7 oct 2026 · AppSec · DevSecOps · Claude Code</div>
+    <h1 class="post-title">Un portero para tus commits: cómo AURI auditó mi app (y mi ego)</h1>
+  </header>
+
+  <article>
+    <figure style="margin-top:0">
+      <img src="img/auri-portero-commits/portero-cover.webp" alt="Un portero de discoteca detiene a un commit sin auditar">
+    </figure>
+
+    <p>Seamos realistas: en esta época, quienes se van introduciendo a la programación dan por sentado que Claude, ChatGPT, Cursor o el sabor de IA que prefieras escribirá un código limpio, estructurado, comentado y totalmente endurecido contra cualquier vulnerabilidad. Generalmente todos estos "ayudantes" nos lo advierten: toma este código como un boilerplate o un MVP que debe ser revisado. No le vas a decir a Claude "crea un SaaS y despliégalo" para que todo sea risas y carcajadas mientras brindas con champagne por tu primera ronda de inversión exitosa. ERROR. Eso no es lo que pasa.</p>
+
+    <p>Lo que pasa en realidad es esto: creas tu app en tiempo récord, no revisas el código, haces un commit, un push a GitHub, despliegas en tu hosting favorito y te olvidas de lo demás. Creo que nos estamos saltando una parte importante, que con poco o mínimo esfuerzo podríamos integrar en nuestro flujo de desarrollo, tanto si eres un <em>vibe coder</em> como si eres un programador "tradicional" que usa la IA como ayudante y no como un desarrollador junior malpagado.</p>
+
+    <p>Estoy hablando concretamente de herramientas de <strong>AppSec</strong> (seguridad de aplicaciones). La propia IA ya puede hacer algo de esto, pero no es lo mismo que una herramienta hecha para buscar tokens expuestos, dependencias obsoletas, errores que filtran información interna y demás.</p>
+
+    <p>En otros tiempos (o en esta misma época, sin MCP) podríamos usar herramientas como <code>pip-audit</code>, <code>npm audit</code> o <code>semgrep</code>, y tendrían un resultado similar al de la herramienta que voy a mostrar aquí. Hablo solo de la versión gratuita de esta última, porque la versión de pago parece ser MUCHO más completa. Pero gratis o no, esto es algo que muchos programadores nuevos están obviando por completo: se despliegan apps todos los días sin la más mínima atención a la seguridad de los secretos, de los datos personales o de cualquier información confidencial. Apps con librerías anticuadas y vulnerabilidades conocidas, simplemente porque la IA las usó y las sugirió.</p>
+
+    <p>Con un MCP de por medio, es mucho más fácil para cualquiera que quiera desplegar su app en tiempo récord tener un mínimo de seguridad. Hablo de <strong>AURI</strong>, un MCP de la compañía <strong>Endor Labs</strong> que en su capa gratuita nos permite correr un escaneo de vulnerabilidades de forma local, desde nuestro propio asistente, sobre nuestra nueva y flamante app. Menos tiempo empleado y menos riesgo por desplegar sin un proceso decente detrás.</p>
+
+    <h2>¿Qué es AURI y para qué sirve?</h2>
+
+    <p>Básicamente, AURI es un <strong>revisor de seguridad para tu código</strong>. Lo conectas a tu asistente de IA de preferencia y revisa varias cosas, incluso en la capa gratuita: las librerías que usa tu proyecto y el código que escribiste (o que una IA escribió por ti, guiño guiño).</p>
+
+    <p>Para qué sirve:</p>
+    <ul>
+      <li><strong>Librerías con fallos conocidos.</strong> Casi todo proyecto usa código de otras personas, y a veces se descubren errores de seguridad en ese código después de que lo instalaste. AURI compara las versiones que usas con una lista de fallos conocidos y te dice a qué versión subir.</li>
+      <li><strong>Errores en tu propio código.</strong> Avisa de malas prácticas, como mostrar mensajes de error internos a los usuarios.</li>
+      <li><strong>Claves olvidadas.</strong> Busca contraseñas o tokens que se hayan quedado escritos en el repositorio.</li>
+      <li><strong>Paquetes maliciosos.</strong> Puede comprobar si un paquete es peligroso antes de que lo instales.</li>
+    </ul>
+
+    <figure>
+      <img src="img/auri-portero-commits/scan-resultado.png" alt="Resultado de un escaneo de AURI con hallazgos ordenados por severidad">
+      <figcaption>Un escaneo de AURI: hallazgos ordenados por severidad.</figcaption>
+    </figure>
+
+    <h2>¿Por qué es útil con desarrollo asistido por IA?</h2>
+
+    <p>Créeme: una IA es muy rápida y sabe muchísimo, pero a la hora de tomar decisiones no siempre acierta. Al final escogerá lo que ella crea más conveniente, y hay que tener en cuenta dos cositas llamadas <strong>alucinaciones</strong> y <strong>sesgos</strong>: problemas que aparecen según la información con la que se entrenó el modelo. Todos los proveedores trabajan día a día para reducirlos, pero no están eliminados al 100 %.</p>
+
+    <p>Seguro que alguna vez le pediste a tu IA de turno un contenedor Docker para una app que haría maravillas. Te sugirió un stack, y al levantar el <code>docker compose</code> descubres que uno de los requisitos tira un error porque <em>no existe</em>. Eso pasa porque la IA te dio el nombre de una librería mal escrito, obsoleto o directamente inventado.</p>
+
+    <p>Y de ahí sale un problema de ciberseguridad aún más grande que muchos ignoran: la <strong>suplantación de paquetes</strong>. A un atacante no le cuesta mucho publicar una librería con un nombre parecido al de una legítima (o justo el que la IA suele inventar) y esperar a que alguien la instale sin comprobarla. Tiene hasta nombre: <em>typosquatting</em> cuando el error es de dedo, y <em>slopsquatting</em> cuando el nombre lo alucinó una IA.</p>
+
+    <p>Aquí es donde entra AURI. Revisa las dependencias y, con base en su información, te sugiere los cambios que hacen falta: una librería anticuada con vulnerabilidades conocidas, por ejemplo. En estos casos, una herramienta así es un salvavidas a la hora de programar, y más cuando el tiempo es crítico.</p>
+
+    <h2>AURI en medio de la fase de implementación</h2>
+
+    <p>Seamos sinceros: en aplicaciones pequeñas o de un solo desarrollador nos encanta saltar directo al CD y olvidarnos del CI. Claro, es la parte más tediosa. Todos queremos ver nuestra app en vivo y ponerla en GitHub y LinkedIn para que el mundo vea lo proactivos que somos y cuánto nos encanta crear. Suena divertido y eficiente, pero no es lo ideal: la fase de CI importa incluso en proyectos pequeños, porque ahí corremos las pruebas y verificaciones que evitan un error capaz de comprometer nuestra app.</p>
+
+    <blockquote>
+      <p><strong>CI/CD en una línea:</strong> CI (integración continua) es revisar el código cada vez que cambia; CD (despliegue continuo) es publicarlo automáticamente cuando pasó esa revisión.</p>
+    </blockquote>
+
+    <p>En términos de seguridad, AURI encaja en esa fase de CI. Revisa las dependencias, los secretos y nuestro propio código (ojo: no la infraestructura, como nginx o Docker). Cada vez que hacemos un cambio puede analizar el proyecto y darnos sugerencias para repararlo antes del despliegue.</p>
+
+    <p>Ahora te estarás preguntando: ¿cómo se supone que haga esto si mi infraestructura no es la de una empresa multimillonaria? No tengo miles de dólares para un pipeline en AWS o Azure con CodePipeline, ECR, Fargate y compañía. Solo somos yo y mis commits contra el mundo. Pero aunque la app sea pequeña, con un poco de ingenio y herramientas gratuitas como AURI siempre se encuentra una solución.</p>
+
+    <p>Un detalle importante: la capa gratuita de Endor Labs no nos deja usar AURI en GitHub Actions. Existe una action oficial, pero pide un <em>tenant</em> (namespace) que el plan gratis no incluye. Habría sido fantástico ejecutar AURI desde GitHub antes de cada despliegue, pero no encontré forma de hacerlo (de hecho, mi intento de sacar un tenant terminó en una pantalla que decía "No authorized tenant found").</p>
+
+    <figure>
+      <img src="img/auri-portero-commits/sin-tenant.png" alt="Pantalla de Endor Labs: No authorized tenant found">
+      <figcaption>El final de mi intento de conseguir un tenant en la capa gratuita.</figcaption>
+    </figure>
+
+    <p>La solución es automatizar AURI en local, <strong>antes de hacer un commit</strong>. Con un script de Python detengo cualquier commit que se haga desde Claude para que AURI lo revise primero, me muestre los hallazgos y me deje decidir: reparar, o commitear bajo mi propio riesgo.</p>
+
+    <h2>El portero de <code>git commit</code></h2>
+
+    <p>Claude Code permite configurar <em>hooks</em>: comandos que se ejecutan solos antes o después de que Claude use una herramienta. Con eso armé un portero de discoteca, pero para commits: nadie entra sin pasar por AURI.</p>
+
+    <figure>
+      <img src="img/auri-portero-commits/flujo-portero.webp" alt="Diagrama del flujo del portero de commits con hooks de Claude Code y AURI">
+      <figcaption>El flujo completo: bloqueo, escaneo, marca y reintento.</figcaption>
+    </figure>
+
+    <h3>Cómo funciona</h3>
+    <ol>
+      <li><strong>Antes del commit.</strong> Cada vez que Claude va a ejecutar algo en la terminal, el portero mira qué es. Si no es un <code>git commit</code>, lo deja pasar sin preguntar nada. Si lo es, comprueba si el estado actual de los archivos ya fue escaneado. Si no, <strong>bloquea el commit</strong> y le deja a Claude una nota con instrucciones.</li>
+      <li><strong>Claude escanea.</strong> Siguiendo la nota, Claude llama a <code>scan</code> de AURI (dependencias, secretos y análisis de código) y te muestra los hallazgos por severidad.</li>
+      <li><strong>El portero toma nota.</strong> Cuando el escaneo termina, un segundo hook guarda una marca: "este estado exacto del proyecto ya fue revisado".</li>
+      <li><strong>Claude reintenta.</strong> Ahora el portero encuentra la marca y deja pasar el commit.</li>
+    </ol>
+
+    <p>Si cambias aunque sea una línea después del escaneo, la marca ya no coincide y toca escanear de nuevo. Así nadie revisa una versión y commitea otra.</p>
+
+    <h3>La huella del estado</h3>
+    <p>Para saber si algo cambió, el script calcula un hash (SHA-256) con la ruta y el contenido de todos los archivos modificados o nuevos. No depende de qué esté en <em>staging</em>, así que un <code>git add</code> no invalida la marca. Las marcas viven en <code>.git/auri-scan/</code>, de modo que nunca se suben al repositorio.</p>
+
+    <h3>¿Por qué bloquea el script y no AURI?</h3>
+    <p>El MCP de AURI solo lo puede llamar Claude, no el sistema, así que un hook normal de git no puede hablar con él. El truco es bloquear el commit y obligar a Claude a correr el escaneo: el portero no revisa nada, solo se asegura de que alguien lo haga.</p>
+
+    <h3>El script</h3>
+    <div class="code-label">.claude/hooks/auri_gate.py</div>
+<pre><code>"""Gate `git commit` behind an AURI scan.
+
+pre  (PreToolUse on Bash): block `git commit` unless the current working-tree
+     state was already scanned; tell Claude to run the scan and report.
+post (PostToolUse on the AURI `scan` tool): record the scanned state.
+
+The state fingerprint hashes every changed/untracked file by path and content,
+so it does not depend on what is staged.
+"""
+import hashlib
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+def git(*args):
+    return subprocess.run(
+        ["git", *args], capture_output=True, check=True
+    ).stdout
+
+def fingerprint():
+    h = hashlib.sha256()
+    out = git("status", "--porcelain", "-uall", "-z").decode("utf-8", "replace")
+    paths = set()
+    entries = out.split("\0")
+    i = 0
+    while i &lt; len(entries):
+        e = entries[i]
+        i += 1
+        if len(e) &lt; 4:
+            continue
+        status, path = e[:2], e[3:]
+        paths.add(path)
+        if status[0] in "RC":  # rename/copy: next entry is the original path
+            i += 1
+    root = Path(git("rev-parse", "--show-toplevel").decode().strip())
+    for p in sorted(paths):
+        h.update(p.encode())
+        f = root / p
+        h.update(f.read_bytes() if f.is_file() else b"&lt;missing&gt;")
+    return h.hexdigest()
+
+def marker_dir():
+    d = Path(git("rev-parse", "--git-dir").decode().strip()) / "auri-scan"
+    d.mkdir(exist_ok=True)
+    return d
+
+def main():
+    mode = sys.argv[1]
+    data = json.load(sys.stdin)
+
+    if mode == "post":
+        (marker_dir() / fingerprint()).write_text("ok")
+        return 0
+
+    cmd = (data.get("tool_input") or {}).get("command", "")
+    if not re.search(r"\bgit\s+(?:-\S+\s+)*commit\b", cmd):
+        return 0
+    if (marker_dir() / fingerprint()).exists():
+        return 0
+
+    sys.stderr.write(
+        "Commit blocked: this working-tree state has not been scanned with AURI.\n"
+        "1. Call mcp__endor-cli-tools__scan with path = the repository root, "
+        'scan_types ["vulnerabilities","secrets","dependencies","sast"], '
+        'scan_options {"summary": true, "exclude_path": ["**/node_modules/**","**/dist/**"]}.\n'
+        "2. Show the user the findings grouped by severity (and any new HIGH/CRITICAL "
+        "ones introduced by this change). Do not hide findings.\n"
+        "3. Then retry the same git commit. Findings alone do not block the commit; "
+        "the user decides.\n"
+        "Any edit after the scan requires a new scan.\n"
+    )
+    return 2
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except Exception as exc:  # never break the session because of the gate itself
+        sys.stderr.write(f"auri_gate: {exc}\n")
+        sys.exit(0)</code></pre>
+
+    <h3>Cómo activarlo</h3>
+    <p>Guarda el script como <code>.claude/hooks/auri_gate.py</code> y regístralo en <code>.claude/settings.local.json</code>:</p>
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/auri_gate.py\" pre" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__endor-cli-tools__scan",
+        "hooks": [
+          { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/auri_gate.py\" post" }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+    <h3>Pero, ¿funciona de verdad? La prueba</h3>
+    <p>Porque un script que "debería funcionar" no es un script que funciona. Hice un cambio real y mínimo (agregar <code>test_email.txt</code> al <code>.gitignore</code>, porque tenía mis cabeceras de correo reales, upsi) y le pedí a Claude que hiciera el commit. Esto fue lo que pasó:</p>
+    <ol>
+      <li><strong>El portero me frenó en la puerta.</strong> El commit se canceló y Claude recibió la nota: "Commit blocked: this working-tree state has not been scanned with AURI".</li>
+      <li><strong>Claude corrió el escaneo de AURI</strong> siguiendo esa nota y me trajo el resumen: <strong>23 hallazgos</strong> (15 críticos, 3 altos, 4 medios y 1 bajo). Ninguno nuevo por mi cambio.</li>
+      <li><strong>Segundo intento y adentro.</strong> Con la marca guardada, el commit pasó sin drama.</li>
+      <li><strong>Para probar que no se deja engañar,</strong> volví a editar el archivo e intenté commitear sin escanear. Bloqueado otra vez. El portero no se deja sobornar.</li>
+    </ol>
+
+    <figure>
+      <img src="img/auri-portero-commits/commit-bloqueado.png" alt="Terminal mostrando el error del hook: Commit blocked">
+      <figcaption>El hook bloqueando el commit y dejándole la nota a Claude.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="img/auri-portero-commits/resumen-23.png" alt="Resumen del escaneo de AURI: 23 hallazgos por severidad">
+      <figcaption>Resumen del escaneo: 15 críticos, 3 altos, 4 medios y 1 bajo.</figcaption>
+    </figure>
+
+    <p>Un tropiezo que te ahorro: si encadenas todo en una sola línea (<code>editar &amp;&amp; git add &amp;&amp; git commit</code>), el portero cancela <strong>el comando entero</strong> antes de que corra nada, incluida tu edición. La marca solo vale para el estado que existe en ese momento, así que primero edita y haz <code>git add</code> en un comando, y deja el commit para otro.</p>
+
+    <h3>Lo que este portero NO hace (porque prometer de más es de mala educación)</h3>
+    <ul>
+      <li><strong>No bloquea por los hallazgos.</strong> Solo bloquea que no se haya escaneado. La decisión final es tuya: reparar, o commitear bajo tu propio riesgo.</li>
+      <li><strong>Solo vigila los commits hechos desde Claude.</strong> Si escribes <code>git commit</code> tú mismo en tu terminal, el portero ni se entera. Es un filtro personal, no sustituye a un CI de verdad.</li>
+      <li><strong>Si el portero se cae, no te deja afuera.</strong> Si el script tiene un error, deja pasar el commit en lugar de romper la sesión.</li>
+      <li><strong>Cada commit tarda lo que tarde el escaneo.</strong> Y escanea el repo completo, no solo tu cambio, así que verás los mismos hallazgos hasta que los resuelvas.</li>
+    </ul>
+
+    <h2>Un use case real</h2>
+
+    <p>Yo, como programador de apps aficionado, tengo una web para revisar correos. Lo que hace la app es tomar un <code>.eml</code> (un correo en crudo) y, con una IA pequeñita (exactamente una IA entrenada solo para esta función; se les llama <strong>BERT</strong> y hay varias versiones), escanearlo y darte un <em>score</em> e <em>insights</em> sobre si el correo es legítimo o si hay sospechas de phishing, <em>whaling</em>, <em>spear phishing</em> y compañía. La herramienta usa distintas fuentes de OSINT para comprobar IPs, enlaces y direcciones, y tiene una API que se puede invocar desde otras apps. Viene muy bien para automatizaciones desde Jira, por ejemplo, llamándola desde un workflow.</p>
+
+    <p>Usé AURI para escanear mi código, que según yo y mi gran ego <strong>no debería tener ninguna librería comprometida ni ningún fallo</strong>. Pero no fue así (<em>EGO HERIDO</em>). Una app de seguridad con la seguridad a medias, la ironía no se me escapa.</p>
+
+    <figure>
+      <img src="img/auri-portero-commits/maildefender.png" alt="MailDefender analizando un correo de phishing con riesgo 100/100">
+      <figcaption>MailDefender analizando un correo de phishing.</figcaption>
+    </figure>
+
+    <h3>Lo que AURI encontró: 93 hallazgos</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Cantidad</th></tr></thead>
+        <tbody>
+          <tr><td>Vulnerabilidades en dependencias</td><td>69 (1 crítica, 34 altas, 26 medias, 8 bajas)</td></tr>
+          <tr><td>Código propio (análisis estático)</td><td>24</td></tr>
+          <tr><td>Secretos o tokens expuestos</td><td><strong>0</strong> (menos mal)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>La mayoría salió de lo mismo: versiones fijadas hace meses y que nadie volvió a mirar. Algunas de las estrellas:</p>
+    <ul>
+      <li><strong><code>aiohttp 3.10.5</code>: 31 avisos</strong>, incluido uno crítico (el parser aceptaba bytes nulos y caracteres de control en cabeceras de respuesta). Aquí un matiz importante: la mayoría de esos avisos afectan al lado <em>servidor</em> de la librería, y mi app la usa solo como <em>cliente</em> (para llamar a VirusTotal y compañía). Aun así, actualizar costó una línea.</li>
+      <li><strong><code>aiosmtplib</code>: inyección de comandos SMTP.</strong> La preferida de mi lista, porque aplicaba de verdad. Mi app responde a quien le reenvía un correo usando la dirección del remitente, y esa dirección la controla el que lo manda. Con saltos de línea en ella, alguien podía colar comandos SMTP. Fix: subir de la 3.0.1 a la 5.1.3.</li>
+      <li><strong><code>python-multipart</code> y <code>starlette</code>: denegación de servicio</strong> en formularios. Mis endpoints para subir correos están abiertos a cualquiera, así que un cuerpo malformado o con cabeceras sin límite podía agotar CPU o memoria.</li>
+      <li><strong>Frontend (<code>vite</code>, <code>postcss</code> y amigos):</strong> más de una docena de avisos, todos de herramientas de <em>build</em>. No afectan al sitio ya compilado, pero un servidor de desarrollo vulnerable en la máquina de quien programa no es un chiste.</li>
+      <li><strong>Código propio: mensajes de error expuestos.</strong> Cinco scanners (VirusTotal, AbuseIPDB, urlscan y el analizador de IA) devolvían <code>str(e)</code> al cliente cuando algo fallaba. Ese tipo de excepciones puede filtrar rutas, URLs internas o versiones. Ahora el detalle va al log y el usuario recibe un mensaje genérico.</li>
+    </ul>
+
+    <figure>
+      <img src="img/auri-portero-commits/antes-despues.webp" alt="MailDefender: escaneo de AURI antes y después, de 93 a 23 hallazgos">
+      <figcaption>De 93 hallazgos a 23, y los 5 arreglos que más importaron.</figcaption>
+    </figure>
+
+    <h3>Lo que NO era para tanto (el ruido)</h3>
+    <p>Una gran parte de lo que encontró era ruido, y aprender a distinguirlo es parte del trabajo:</p>
+    <ul>
+      <li><strong>15 hallazgos "críticos" por usar <code>random</code></strong>, en el script que genera mis datos sintéticos de entrenamiento. No genera claves ni tokens, así que es un falso positivo. Cambiarlo a <code>secrets</code> solo rompería la reproducibilidad de mi dataset.</li>
+      <li>Un par de avisos en un script de desarrollo que corre en mi máquina, con una URL fija.</li>
+      <li>Un puñado de avisos en herramientas de <em>build</em> de Tailwind, sin parche disponible, que se arreglan con una migración mayor que merece su propio PR.</li>
+    </ul>
+
+    <h3>Después de arreglar</h3>
+    <p>Subí las versiones, probé la app (arranca, responde y analiza correos igual que antes) y volví a escanear: de <strong>93 hallazgos a 23</strong>. De esos 23, 15 son el falso positivo de <code>random</code> y el resto son herramientas de desarrollo o cosas sin parche. Todas las vulnerabilidades de <code>aiohttp</code>, <code>python-multipart</code>, <code>starlette</code> y <code>aiosmtplib</code> quedaron cerradas.</p>
+
+    <h2>Conclusiones</h2>
+    <p>Después de todo este recorrido, mis conclusiones son estas:</p>
+    <ol>
+      <li><strong>Mi ego no sobrevivió, pero mi app sí, y mejor.</strong> Cerré 65 de las 69 vulnerabilidades de dependencias, y la que más me importaba (la inyección SMTP) estaba en una librería que ni siquiera sabía que estaba desactualizada.</li>
+      <li><strong>Una herramienta no sustituye al criterio.</strong> De 93 hallazgos, 15 "críticos" eran ruido y el más importante en la práctica estaba marcado solo como "alto". AURI encuentra; decidir qué importa en <em>tu</em> app sigue siendo tu trabajo.</li>
+      <li><strong>La IA escribe rápido, pero no revisa lo que escribe.</strong> Casi todo el problema vino de versiones que alguien (una IA, yo, da igual) fijó una vez y nunca más miró. Meter la revisión en el mismo flujo donde se genera el código lo cambia todo.</li>
+      <li><strong>La seguridad no tiene que costar un pipeline de empresa.</strong> Con un MCP gratuito, un script de unas 90 líneas y un portero que no se deja sobornar, un proyecto de una sola persona puede tener un filtro razonable antes de cada commit.</li>
+      <li><strong>Seamos honestos con las limitaciones.</strong> La capa gratuita no corre en GitHub Actions, el portero solo vigila los commits que pasan por Claude, y esto no sustituye a un CI de verdad con revisión de infraestructura. Es un primer filtro, no la muralla china.</li>
+    </ol>
+
+    <p>Mi consejo: si usas IA para programar, pasa tu proyecto por una herramienta de este tipo <strong>antes</strong> de desplegar. Tarda poco, cuesta cero y evita que tu app sea la próxima lección de alguien en Twitter. Yo ya me quedé más tranquilo, y haciendo mis commits un poco más alegre, sabiendo que antes de entrar a mi repositorio todo pasa por un portero que no se deja sobornar.</p>
+
+    <p>Y tú, ¿cuántas vulnerabilidades crees que tiene tu app ahora mismo? Yo también pensaba que ninguna.</p>
+
+    <h2>Enlaces de interés</h2>
+    <div class="links-box">
+      <ul>
+        <li><a href="https://www.endorlabs.com/" target="_blank" rel="noopener">↗ Endor Labs</a></li>
+        <li><a href="https://www.endorlabs.com/auri" target="_blank" rel="noopener">↗ AURI for Developers (Endor Labs)</a></li>
+        <li><a href="https://docs.endorlabs.com/secure-ai-coding/" target="_blank" rel="noopener">↗ Documentación de AURI: Secure AI Coding</a></li>
+        <li><a href="https://maildefender.xyz" target="_blank" rel="noopener">↗ MailDefender: maildefender.xyz</a></li>
+      </ul>
+    </div>
+  </article>
+
+  <footer class="port-footer">
+    <span>Jeffrey Cedeño · <a href="/">jeffreycedeno.com</a></span>
+    <span><a href="mailto:hello@jeffreycedeno.com">hello@jeffreycedeno.com</a></span>
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Vista ampliada">
+  <img id="lb-img" src="" alt="">
+</div>
+
+<script>
+(function () {
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  document.querySelectorAll('article figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  function close() { lb.classList.remove('open'); document.body.style.overflow = ''; }
+  lb.addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+</script>
+</body>
+</html>
