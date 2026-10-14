@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AppSec From Your Terminal — Jeffrey Cedeño</title>
+<meta name="description" content="I built auri-tui, a Go terminal UI that talks directly to the Endor Labs MCP server over JSON-RPC on stdio, with no AI client in the loop.">
+<meta property="og:title" content="AppSec From Your Terminal">
+<meta property="og:description" content="I built auri-tui, a Go terminal UI that talks directly to the Endor Labs MCP server over JSON-RPC on stdio, with no AI client in the loop.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="img/auri-appsec-terminal/auri-resultados.png">
+<link rel="alternate" hreflang="es" href="auri-appsec-desde-terminal.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg: #ffffff; --ink: #111111; --ink2: #444444; --ink3: #888888;
+  --accent: #1a472a; --border: #e8e8e8;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif; --display: 'Syne', sans-serif;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.7; }
+
+nav {
+  position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: space-between; padding: 0 2rem; height: 52px; z-index: 100;
+}
+.nav-logo { font-family: var(--mono); font-size: 13px; color: var(--ink); text-decoration: none; }
+.nav-logo:hover { color: var(--accent); }
+.nav-right { display: flex; gap: 1.25rem; align-items: center; }
+.nav-back, .nav-lang { font-family: var(--mono); font-size: 12px; color: var(--ink3); text-decoration: none; }
+.nav-back:hover, .nav-lang:hover { color: var(--ink); }
+.nav-lang { border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; }
+
+.outer { max-width: 760px; margin: 0 auto; padding: 0 2rem; }
+.post-hero { padding: 2.5rem 0 2rem; }
+.post-meta { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-bottom: 0.75rem; }
+.post-title {
+  font-family: var(--display); font-size: clamp(1.7rem, 4.5vw, 2.4rem);
+  font-weight: 800; line-height: 1.15; letter-spacing: -0.02em;
+}
+
+article p { color: var(--ink2); font-size: 15.5px; margin-bottom: 1.1rem; }
+article h2 {
+  font-family: var(--display); font-size: 1.4rem; font-weight: 700; line-height: 1.25;
+  margin: 2.5rem 0 1rem; letter-spacing: -0.01em; scroll-margin-top: 70px;
+}
+article h3 { font-family: var(--display); font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.75rem; }
+article ul, article ol { margin: 0 0 1.1rem 1.4rem; color: var(--ink2); font-size: 15.5px; }
+article li { margin-bottom: 0.45rem; padding-left: 0.2rem; }
+article a { color: var(--accent); }
+article strong { color: var(--ink); }
+
+code {
+  font-family: var(--mono); font-size: 0.88em; background: #f3f4f6;
+  padding: 1px 5px; border-radius: 3px; color: var(--ink);
+}
+pre {
+  background: #0f1412; color: #e6ede9; border-radius: 8px; padding: 1.1rem 1.25rem;
+  overflow-x: auto; margin: 0 0 1.4rem; font-size: 12.5px; line-height: 1.6;
+}
+pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+.code-label { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-bottom: 0.4rem; }
+
+blockquote {
+  background: #f5faf6; border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  padding: 0.8rem 1.1rem; margin: 0 0 1.4rem;
+}
+blockquote p { margin: 0; font-size: 14.5px; }
+
+figure { margin: 1.5rem 0 1.8rem; }
+figure img {
+  width: 100%; height: auto; display: block; border: 1px solid var(--border);
+  border-radius: 8px; cursor: zoom-in;
+}
+figcaption { font-family: var(--mono); font-size: 11.5px; color: var(--ink3); margin-top: 0.5rem; }
+
+.table-wrap { overflow-x: auto; margin: 0 0 1.4rem; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th {
+  font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink3); font-weight: 500; text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--border); background: #fafafa;
+}
+td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; color: var(--ink2); }
+
+.links-box { border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; margin: 1rem 0 0; }
+.links-box ul { margin-bottom: 0; list-style: none; margin-left: 0; }
+.links-box li { padding-left: 0; }
+.links-box a { font-family: var(--mono); font-size: 13px; text-decoration: none; }
+.links-box a:hover { opacity: 0.65; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999;
+  align-items: center; justify-content: center; cursor: zoom-out; padding: 2rem;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
+
+.port-footer {
+  border-top: 1px solid var(--border); padding: 1.5rem 0 3rem; margin-top: 3rem;
+  font-family: var(--mono); font-size: 12px; color: var(--ink3);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+.port-footer a { color: var(--ink3); text-decoration: none; }
+.port-footer a:hover { color: var(--ink); }
+
+@media (max-width: 600px) {
+  .outer { padding: 0 1rem; }
+  nav { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">jeffreycedeno.com</a>
+  <div class="nav-right">
+    <a href="auri-appsec-desde-terminal.html" class="nav-lang" hreflang="es">Leer en español</a>
+    <a href="../index.html#blog" class="nav-back">← Blog</a>
+  </div>
+</nav>
+
+<div class="outer">
+  <header class="post-hero">
+    <div class="post-meta">Oct 14, 2026 · AppSec · MCP · Terminal</div>
+    <h1 class="post-title">AppSec From Your Terminal</h1>
+  </header>
+
+  <article>
+    <p>When you're into cybersecurity, you often end up thinking it all boils down to being an attacker or a defender. There's this idea that cybersecurity is just someone attacking and someone defending, and in most cases I think that's true. But as you learn, read, and dig in, you realize cybersecurity is actually pretty broad: there's something for every kind of interest. A good sign of that is the roles now opening up around AI Security, Prompt Security, and so on.</p>
+
+    <p>The past few weeks I've been reading a lot about the concept of AppSec. As I mentioned in <a href="auri-commit-gatekeeper.html">another post</a>, I got really interested in a product from a company called Endor Labs, which builds tools for developers: basically, their product analyzes your code, containers, and CI/CD pipeline to find vulnerabilities, many of which show up because of the new trend of leaning on AI-powered development tools.</p>
+
+    <p>That said, it got me thinking that traditional programming is a bit left out of this whole conversation. What happens if I'm not leaning on AI and just want to review my own code? Maybe you're old-school and want to check your dependencies and scan your local repo for exposed secrets and vulnerabilities — why not?</p>
+
+    <p>I set myself an exercise: what if I could talk to the Endor Labs MCP (free on their Developer tier) directly from my terminal, and review my commits without needing to ask an AI to do it for me? I know that's not the most common use case these days, but it works great as an exercise and as a way to better understand its use cases, especially with tools like MCPs.</p>
+
+    <p>I know MCPs go hand in hand with AI clients — they were invented, after all, to give models more power and more ways to generate or do all kinds of things. But at the end of the day, an MCP is just a way for different applications to talk to each other, so why couldn't we invoke one from a terminal instead of from a prompt in Claude or Cursor?</p>
+
+    <h2>The problem</h2>
+
+    <p>I tend to write small scripts to solve all kinds of tasks, from automations to Lambda functions that receive and analyze alert data on AWS. I don't always use AI for it: sometimes I like doing it straight from the code editor, reading a bit online — the old-fashioned way. I'm one of those people who learns by doing, and I don't want AI to make me "lazy," so to speak, in the thing I'm passionate about: learning more about technology.</p>
+
+    <p>These repos, scattered across folders all over my computer, I generally push to GitHub and leave there to keep developing, but I almost never run any kind of scan on them. It's something I'd been putting off for a long time, but discovering tools like Endor's made it click: in cybersecurity, you don't skimp on measures to avoid leaving doors open for anyone who wants to attack an organization.</p>
+
+    <p>Since I don't manage some of these repos with AI, I'd have to settle for traditional scanning methods — the various tools npm already ships with, for example. But I wanted something more centralized: something I could invoke, that would find the flaws, fix them, and, why not, report them to me, so I could get a quick read on the health of various small repos.</p>
+
+    <h2>The solution</h2>
+
+    <p>After mulling it over, I concluded that MCPs are, at their core, communication tools: I can talk to them from the terminal using stdio to send data and receive responses from any MCP, as long as I'm properly authenticated. So I thought: why not build a small app to do this for me? And that's what I did — I created a small terminal app, with a small UI, that uses the Endor MCP and scans my commits or whole repos without needing an AI client in between.</p>
+
+    <p>I mean, there's no need to overcomplicate this: at the end of the day I could just tell Claude to check the folder, connect to the Endor MCP, analyze the repo or the commits, and give me back a natural-language answer. That's ultimately the appeal of combining MCP with AI: the MCP's responses get processed through the model's NLP system and turned into already-analyzed answers. But that would take away the fun of actually learning, and I'd like to believe that, for someone else, this could also be useful at some point.</p>
+
+    <h2>How does it work?</h2>
+
+    <p>The app is called <strong>auri-tui</strong>, and it's basically a terminal user interface (TUI) written in Go, using <a href="https://github.com/charmbracelet/bubbletea" target="_blank" rel="noopener">Bubble Tea</a> for state management and <a href="https://github.com/charmbracelet/lipgloss" target="_blank" rel="noopener">Lip Gloss</a> for the visual styling. It has no HTTP client of its own and doesn't manage credentials: all authentication and communication with Endor Labs is fully delegated to <code>endorctl</code>, Endor's official CLI.</p>
+
+    <p>The flow is simple:</p>
+    <ol>
+      <li><code>auri-tui</code> spawns <code>endorctl ai-tools mcp-server</code> as a child process (via <code>npx -y endorctl ai-tools mcp-server</code>) and opens a <strong>JSON-RPC 2.0 channel over stdin/stdout</strong> with it — that's where the MCP protocol lives, no HTTP or sockets involved.</li>
+      <li>It shows you a menu to pick what to scan: your local changes, a specific commit, the full repo, a secrets scan, or even an "advanced" mode to invoke any MCP tool by hand.</li>
+      <li>Depending on what you pick, it discovers dependency manifests (<code>package.json</code>, <code>go.mod</code>, <code>requirements.txt</code>, <code>pom.xml</code>...) and asks Endor, dependency by dependency, whether it has known vulnerabilities — or, if you picked the secrets scan, it makes a single call that runs Endor's secrets scanner over the whole repository.</li>
+      <li>It renders the results as bar charts and a risk gauge made of Unicode block characters — no charting libraries, just colored text.</li>
+      <li>It lets you review each finding one by one, and if there's a known version bump that fixes it, it shows you the exact diff that would be applied to the manifest. Nothing gets written to disk without you explicitly confirming it.</li>
+    </ol>
+
+    <figure>
+      <img src="img/auri-appsec-terminal/auri-menu.png" alt="auri-tui main menu with the scan options">
+      <figcaption>The main menu: each option maps to a different "engine" — local changes, a specific commit, the full repo, secrets, or the MCP tool browser for when you want to get your hands dirty.</figcaption>
+    </figure>
+
+    <p>It also integrates directly with <a href="https://github.com/jesseduffield/lazygit" target="_blank" rel="noopener">Lazygit</a>: a single <code>Ctrl+A</code> inside lazygit opens <code>auri-tui</code> fullscreen, and when you exit you land right back where you were. The idea is to keep it one keystroke away from your normal git workflow, without having to remember to run anything separately.</p>
+
+    <h2>A demo-repo example</h2>
+
+    <p>To actually test it I put together a tiny, intentionally vulnerable repo — nothing headed to production, just old, well-known package versions with documented CVEs: <code>axios@0.19.2</code>, <code>lodash@4.17.15</code>, <code>minimist@1.2.0</code>, <code>log4j-core@2.14.1</code> (yes, the Log4Shell one), and a couple of Python dependencies with known vulnerabilities. I also threw in a file with fake AWS and GitHub credentials to test the secrets scan.</p>
+
+    <p>The first thing the app does is let you pick which commit to scan:</p>
+
+    <figure>
+      <img src="img/auri-appsec-terminal/auri-commits.png" alt="Commit picker in auri-tui">
+    </figure>
+
+    <p>While it scans, each dependency is queried against the Endor MCP one at a time — that's why there's a small animation of an envelope traveling between "you" and "Endor Labs," to make it clear there's a real conversation happening in the background:</p>
+
+    <figure>
+      <img src="img/auri-appsec-terminal/auri-scanning.png" alt="Scan-in-progress screen, querying the Endor Labs MCP dependency by dependency">
+    </figure>
+
+    <p>And the result: 40 findings, 4 of them critical (including Log4Shell), with a risk gauge that doesn't pull any punches: 100/100.</p>
+
+    <figure>
+      <img src="img/auri-appsec-terminal/auri-resultados.png" alt="Scan results with 40 findings and a 100/100 risk score">
+    </figure>
+
+    <p>From there I can go through each finding one by one. For <code>minimist</code>, for example, it shows me the exact diff it would apply — the vulnerable version struck through in red, the fixed one in green — and waits for me to press <code>a</code> to apply it or <code>s</code> to skip it. Nothing gets touched without explicit confirmation:</p>
+
+    <figure>
+      <img src="img/auri-appsec-terminal/auri-fix.png" alt="Reviewing a finding with the exact diff to apply">
+    </figure>
+
+    <p>And finally, the secrets scan — which runs Endor's real scanner over the whole repo — found the two fake credentials I left on purpose. The interesting part is that Endor doesn't just detect them by pattern: it validates them live against the real service, and in this case it confirms both are already inactive:</p>
+
+    <figure>
+      <img src="img/auri-appsec-terminal/auri-secretos.png" alt="Secrets scan results: two exposed credentials, already invalid">
+    </figure>
+
+    <p>All of this can also be exported as a Markdown report with a single <code>e</code> keypress, ready to paste into an issue or keep as evidence.</p>
+
+    <h2>App features</h2>
+
+    <ul>
+      <li><strong>Two scan engines</strong>: one for dependencies/malware (queries Endor for every unique dependency it finds) and one for secrets (a single call that runs Endor's full scanner over the repo).</li>
+      <li><strong>Multiple scan targets</strong>: just your uncommitted local changes, a specific commit (via a temporary worktree, without touching your real working tree), the full repository, or a manual browser to invoke any MCP tool.</li>
+      <li><strong>Terminal chart results</strong>: severity bars, a category breakdown, and a 0–100 risk gauge — all built with Unicode characters, no external charting dependencies.</li>
+      <li><strong>Review and apply fixes with manual confirmation</strong>: each finding is reviewed one at a time, diff included, and nothing is written to disk without the user explicitly pressing the key to apply it.</li>
+      <li><strong>Markdown export</strong>: a full report with the summary, risk score, and every finding grouped by severity, ready to share.</li>
+      <li><strong>Lazygit integration</strong>: a single keyboard shortcut (<code>Ctrl+A</code>) to open the whole flow without leaving your git tool.</li>
+      <li><strong>Built-in folder picker</strong>: you can point it at any repository without having to relaunch the app from that folder.</li>
+      <li><strong>100% free</strong>: it only uses Endor Labs MCP tools available on their free tier (Developer Edition) — no <code>endorctl scan</code> license or Enterprise CLI required.</li>
+      <li><strong>Installers for Mac, Linux, and Windows</strong>: they compile the binary from source on your own machine (no prebuilt binaries, no Gatekeeper warnings) and automatically set up the Lazygit shortcut if they detect it installed.</li>
+    </ul>
+
+    <p>If you want to try it, the repo is public: <strong><a href="https://github.com/JeffreyCq/auri-tui" target="_blank" rel="noopener">github.com/JeffreyCq/auri-tui</a></strong>, with one-command installers for Mac, Linux, and Windows.</p>
+
+    <h2>Conclusions</h2>
+
+    <p>It was an absolute blast learning more about MCPs and how they communicate, and also about how this kind of solution can be used as a sort of alternative to traditional APIs. They turn everyday tools into fairly powerful systems that, with a bit of imagination and a pipeline for development or any other activity, can make our automations feel professional and at the forefront of everything changing in this AI era.</p>
+
+    <p>I firmly believe that to use a tool well, it's always worth understanding how it actually works. I love being able to wrap up this little project and say I know how an MCP works, not just the name and what it's for. At the end of the day, real knowledge opens a lot of doors in your mind, and that satisfaction of truly knowing and understanding something can never be matched by an AI-generated answer.</p>
+
+    <h2>Useful links</h2>
+    <div class="links-box">
+      <ul>
+        <li><a href="https://github.com/JeffreyCq/auri-tui" target="_blank" rel="noopener">↗ auri-tui on GitHub</a></li>
+        <li><a href="https://www.endorlabs.com/auri" target="_blank" rel="noopener">↗ AURI for Developers (Endor Labs)</a></li>
+        <li><a href="https://docs.endorlabs.com/secure-ai-coding/" target="_blank" rel="noopener">↗ AURI documentation: Secure AI Coding</a></li>
+        <li><a href="https://github.com/charmbracelet/bubbletea" target="_blank" rel="noopener">↗ Bubble Tea</a></li>
+        <li><a href="https://github.com/jesseduffield/lazygit" target="_blank" rel="noopener">↗ Lazygit</a></li>
+      </ul>
+    </div>
+  </article>
+
+  <footer class="port-footer">
+    <span>Jeffrey Cedeño · <a href="/">jeffreycedeno.com</a></span>
+    <span><a href="mailto:hello@jeffreycedeno.com">hello@jeffreycedeno.com</a></span>
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged view">
+  <img id="lb-img" src="" alt="">
+</div>
+
+<script>
+(function () {
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  document.querySelectorAll('article figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  function close() { lb.classList.remove('open'); document.body.style.overflow = ''; }
+  lb.addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+</script>
+</body>
+</html>
